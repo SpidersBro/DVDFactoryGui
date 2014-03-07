@@ -10,13 +10,12 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
+//import javax.imageio.ImageIO;
 
 import org.apache.commons.math3.distribution.*;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
 
 
@@ -685,12 +684,21 @@ public class Factory {
 			cbtnBusyM2_1.setSelection(m2Busy[1]);
 			lblBrokenDVDs.setText("Broken DVDs: " + brokenDVDsint.toString());			
 			dvdProduced.setText("Dvd's produced: " + producedDVDs.toString());
-			lblCartridgeSize_0.setText("DVDs left before refill: " + cartridgeSize_0.toString());
-			lblCartridgeSize_1.setText("DVDs left before refill: " + cartridgeSize_1.toString());
+			if(m4Repairing[0]){
+				lblCartridgeSize_0.setText("DVDs left before refill: 0");
+			} else {
+				lblCartridgeSize_0.setText("DVDs left before refill: " + cartridgeSize_0.toString());
+			}
+			if(m4Repairing[1]){
+				lblCartridgeSize_1.setText("DVDs left before refill: 0");
+			} else {
+				lblCartridgeSize_1.setText("DVDs left before refill: " + cartridgeSize_1.toString());
+			}
 			//cbtnCleaningM4_0.setSelection(m3);
 			//cbtnCleaningM4_1.setSelection(m3);
-			cbtnRefillM4_0.setSelection(m4Repairing[0]);
-			cbtnRefillM4_1.setSelection(m4Repairing[1]);
+			
+			cbtnRefillM4_0.setSelection(m4Repairing[1]);
+			cbtnRefillM4_1.setSelection(m4Repairing[0]);
 			lblCurrentTime.setText("Current time: " + currentTime0.toString());
 			
 			
@@ -838,6 +846,7 @@ public class Factory {
 		lblBrokenDVDs.setBounds(359, 298, 116, 14);
 		lblBrokenDVDs.setText("Broken DVDs: 0");
 		
+		/*
 		cbtnCleaningM4_0 = new Button(shell, SWT.CHECK);
 		cbtnCleaningM4_0.setBounds(648, 218, 94, 18);
 		cbtnCleaningM4_0.setText("Cleaning");
@@ -845,7 +854,7 @@ public class Factory {
 		cbtnCleaningM4_1 = new Button(shell, SWT.CHECK);
 		cbtnCleaningM4_1.setBounds(648, 468, 94, 18);
 		cbtnCleaningM4_1.setText("Cleaning");
-		
+		*/
 		cbtnRefillM4_0 = new Button(shell, SWT.CHECK);
 		cbtnRefillM4_0.setBounds(938, 118, 94, 18);
 		cbtnRefillM4_0.setText("Refill");
