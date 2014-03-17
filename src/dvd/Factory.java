@@ -39,6 +39,41 @@ public class Factory {
 	
 	
 /////------------------------------------ Declarations and init() --------------------------\\\\\\\\\
+	
+	// These are all for the GUI.
+	protected Shell shell;
+	private Label dvdProduced;
+	private Label dvdFactoryImage;
+	private Label lblBuffer1;
+	private Label lblBuffer0;
+	private Label lblCrateFront0;
+	private Label lblCrateFront1;
+	private Label lblCrateIn0;
+	private Label lblCrateIn1;
+	private Label lblCrateBack1;
+	private Label lblCrateBack0;
+	private Button cbtnIdleM1_0;
+	private Button cbtnIdleM1_1;
+	private Button cbtnIdleM1_2;
+	private Button cbtnIdleM1_3;
+	private Button cbtnRepairingM1_0;
+	private Button cbtnRepairingM1_1;
+	private Button cbtnRepairingM1_2;
+	private Button cbtnRepairingM1_3;
+	private Button cbtnIdleM2_0;
+	private Button cbtnIdleM2_1;
+	private Button cbtnBusyM2_0;
+	private Button cbtnBusyM2_1;
+	private Label lblBrokenDVDs;
+	private Label lblCartridgeSize_0;
+	private Label lblCartridgeSize_1;
+	private Button cbtnCleaningM4_0;
+	private Button cbtnCleaningM4_1;
+	private Button cbtnRefillM4_0;
+	private Button cbtnRefillM4_1;
+	private Label lblCurrentTime;
+
+	
 
 	// These are the variables we can increase or decrease and may  the production.
 	public static double currentTime = 0;
@@ -586,37 +621,9 @@ public class Factory {
 	}
 
 
-	protected Shell shell;
-	private Label dvdProduced;
-	private Label dvdFactoryImage;
-	private Label lblBuffer1;
-	private Label lblBuffer0;
-	private Label lblCrateFront0;
-	private Label lblCrateFront1;
-	private Label lblCrateIn0;
-	private Label lblCrateIn1;
-	private Label lblCrateBack1;
-	private Label lblCrateBack0;
-	private Button cbtnIdleM1_0;
-	private Button cbtnIdleM1_1;
-	private Button cbtnIdleM1_2;
-	private Button cbtnIdleM1_3;
-	private Button cbtnRepairingM1_0;
-	private Button cbtnRepairingM1_1;
-	private Button cbtnRepairingM1_2;
-	private Button cbtnRepairingM1_3;
-	private Button cbtnIdleM2_0;
-	private Button cbtnIdleM2_1;
-	private Button cbtnBusyM2_0;
-	private Button cbtnBusyM2_1;
-	private Label lblBrokenDVDs;
-	private Label lblCartridgeSize_0;
-	private Label lblCartridgeSize_1;
-	private Button cbtnCleaningM4_0;
-	private Button cbtnCleaningM4_1;
-	private Button cbtnRefillM4_0;
-	private Button cbtnRefillM4_1;
-	private Label lblCurrentTime;
+	
+	
+/////------------------------------------ Main loop --------------------------\\\\\\\\\
 
 	/**
 	 * Launch the application.
@@ -630,6 +637,10 @@ public class Factory {
 			e.printStackTrace();
 		}
 	}
+
+	
+	
+/////------------------------------------  GUI  --------------------------------\\\\\\\\\
 
 	/**
 	 * Open the window.
@@ -748,7 +759,7 @@ public class Factory {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(1096, 570);
-		shell.setText("SWT Application");
+		shell.setText("DVD Factory");
 		
 		dvdProduced = new Label(shell, SWT.NONE);
 		dvdProduced.setBounds(882, 298, 182, 25);
