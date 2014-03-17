@@ -10,8 +10,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
-//import javax.imageio.ImageIO;
-
 import org.apache.commons.math3.distribution.*;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
