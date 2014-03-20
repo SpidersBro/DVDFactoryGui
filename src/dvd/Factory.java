@@ -17,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 
 
-
 public class Factory {
 	
 /////-------------------------------------------- Testing	-------------------------------\\\\\\\\\\	
@@ -64,12 +63,11 @@ public class Factory {
 	private Label lblBrokenDVDs;
 	private Label lblCartridgeSize_0;
 	private Label lblCartridgeSize_1;
-	private Button cbtnCleaningM4_0;
-	private Button cbtnCleaningM4_1;
 	private Button cbtnRefillM4_0;
 	private Button cbtnRefillM4_1;
 	private Label lblCurrentTime;
-
+	private Button cbtnBusyM3;
+	private Button cbtnBusyM3_1;
 	
 
 	// These are the variables we can increase or decrease and may  the production.
@@ -118,12 +116,16 @@ public class Factory {
 	
 	// state for all machine 3	
 	public static boolean[] m3_3WaitingForSwap = new boolean[amountM3];
+	public static int[] m3_numBlockedNozzles = new int[amountM3];
 	
 	// state for all machine 4
 	public static boolean[] m4Idle = new boolean[amountM4];
 	public static boolean[] m4Repairing = new boolean[amountM4];
 	public static int[] cartridge = new int[amountM4]; 
 	public static int[] countDVDs = new int[amountM4];
+	private Label lblNozzlesBlocked0;
+	private Label lblNozzlesBlocked1;
+
 	
 	
 	
@@ -155,7 +157,7 @@ public class Factory {
 			cbIdle[i] = false;
 			m2Idle[i] = false;
 			m2Busy[i] = false;
-			cbWaitingForSwap[i] = false;
+			//cbWaitingForSwap[i] = false;
 			Queue<DVD> buffer = new LinkedList<DVD>();
 			bufferList.add(buffer);
 			Queue<Double> cbWaitTime = new LinkedList<Double>();
@@ -167,7 +169,7 @@ public class Factory {
 		
 		// All crates are empty
 		for ( int i = 0; i < amountM3; i++){
-			m3_3WaitingForSwap[i] = true;
+			m3_3WaitingForSwap[i] = false;
 			ArrayList<DVD> crateFront = new ArrayList<DVD>();
 			ArrayList<DVD> crateIn = new ArrayList<DVD>();
 			ArrayList<DVD> crateBack = new ArrayList<DVD>();
@@ -180,7 +182,7 @@ public class Factory {
 		// ProductionStep 4 is running, and cartridgeSize is initialized
 		for ( int i = 0; i < amountM4; i++){
 			m4Repairing[i] = false;
-			m4Idle[i] = true;
+			//m4Idle[i] = true;
 			cartridge[i] = getCartridgeSize();
 			countDVDs[i] = 0;
 		}
@@ -324,7 +326,7 @@ public class Factory {
 				if(crateFrontList.get(e.machineNum).size() == 20){
 					Event swapCrates = new Event(currentTime,6,e.machineNum,null);
 					eventList.add(swapCrates);
-					cbWaitingForSwap[e.machineNum] = true; // Jiske: Denk dat dit toch nodig is. 
+					//cbWaitingForSwap[e.machineNum] = true; // Jiske: Denk dat dit toch nodig is. 
 				}
 			// If 20 
 			} else {
@@ -347,32 +349,61 @@ public class Factory {
 		ArrayList<DVD> tempCrateFront = new ArrayList<DVD>();
 		ArrayList<DVD> tempCrateIn = new ArrayList<DVD>();
 		
-		for(int i = 0; i < cbWaitingForSwap.length; i++ ){
-			for(int j = 0; j < m3_3WaitingForSwap.length; j++ ) {
-				for(int k = 0; k < m4Idle.length; k++) {
-					if(cbWaitingForSwap[i] && m3_3WaitingForSwap[j] && m4Idle[k]){
-						tempCrateFront = (ArrayList<DVD>) crateFrontList.get(i).clone();
-						tempCrateIn = (ArrayList<DVD>) crateInList.get(j).clone();
+		for(int i = 0; i < amountM2; i++ ){
+			for(int j = 0; j < amountM3; j++ ) {
+				for(int k = 0; k < amountM4; k++) {
+					
+					
+					/*
+					 * 
+					 * A crate must be swapped from Back to In when:
+					 * 		crateBack.size() = 0 AND crateIn.size() = 20. 
+					 * 		For any machines in the line
+					 * 
+					 * OR
+					 */			
+					if(  crateBackList.get(k).size() == 0 && crateInList.get(j).size() == 20 && m3_3WaitingForSwap[j]) {
 						
+						//Swap crateBack and CrateIn
+						tempCrateIn = (ArrayList<DVD>) crateInList.get(j).clone();
 						crateBackList.set(k,tempCrateIn);
+						crateInList.get(j).clear();
+					
+						//If M4 is not repairing, it should now start again.
+						if(!m4Repairing[k]) {
+							Event m4ScheduledFinished = new Event(eventTimeM4(),9,k,null);
+							eventList.add(m4ScheduledFinished);
+						}
+						
+						m3_3WaitingForSwap[j] = false;
+						
+					}
+					
+					
+					/* 
+					 * 
+					 *
+					 * A crate must be swapped from In to Front when:
+					 * 		crateIn.size() = 0  AND crateFront.size() = 20.
+					 * 		(this is the case in the initial state and otherwise only when 2 and 3 already have been swapped)
+					 * 
+					 */	
+					if (crateInList.get(j).size() == 0 && crateFrontList.get(i).size() == 20 ) {
+						
+						//Swap crateIn with crateFront
+						tempCrateFront = (ArrayList<DVD>) crateFrontList.get(i).clone();
 						crateInList.set(j,tempCrateFront);
 						crateFrontList.get(i).clear();
-						
-						Event m3_12ScheduledFinished = new Event(eventTimeM3_12(),7,j,null);
-						eventList.add(m3_12ScheduledFinished);
-						
-						
-						cbWaitingForSwap[i] = false;
-						m3_3WaitingForSwap[j] = false;
-						m4Idle[k] = false;
-						cbIdle[i] = false;
-						
+
+						// If the front crate is now empty, start up the conveyor belt in front of the crate again.
 						while(!cbWaitingDVD.get(i).isEmpty()){
 							DVD this_DVD = cbWaitingDVD.get(i).remove();
 							Event CBfinished = new Event((currentTime + cbWaitingTime.get(i).remove()),5,i,this_DVD);
 							eventList.add(CBfinished);
 						}
+						cbIdle[i] = false;
 						
+						// If the conveyorbelt starts up again, so should M2.
 						if(m2Busy[i]) {
 							m2Idle[i] = false;
 							Event m2ScheduledFinished = new Event(currentTime,4,i,m2WaitingDVD.get(i));
@@ -384,10 +415,10 @@ public class Factory {
 							eventList.add(m2ScheduledFinished);
 						}
 						
-						if(!m4Repairing[k]) {
-							Event m4ScheduledFinished = new Event(eventTimeM4(),9,k,null);
-							eventList.add(m4ScheduledFinished);
-						}
+						// And if crateIn is now full, M3 should also start again.
+						Event m3_12ScheduledFinished = new Event(eventTimeM3_12(),7,j,null);
+						eventList.add(m3_12ScheduledFinished);
+						
 					}	
 				}
 			}
@@ -399,7 +430,8 @@ public class Factory {
            
         //Delay in seconds
         int delay = 0;
-       
+        m3_numBlockedNozzles[e.machineNum] = 0;
+        
         // Make a random object
         Random rand = new Random();
         double nozzleBlockChance;
@@ -414,12 +446,13 @@ public class Factory {
                     nozzleBlockChance = rand.nextDouble();
                     if (nozzleBlockChance < .03) {
                             delay += 300;
+                            m3_numBlockedNozzles[e.machineNum]++;
                     }
             }
-           
+            
             Event m3_3Finished = new Event((eventTimeM3_3()+delay),8,e.machineNum,null);
             eventList.add(m3_3Finished);
-       
+            
         }
 
 	private static void m3_3ScheduledFinished(Event e) {
@@ -441,7 +474,7 @@ public class Factory {
 				producedDVDQueue.add(this_dvd);
 				
 				if(crateBackList.get(e.machineNum).isEmpty()){
-					m4Idle[e.machineNum] = true;
+					//m4Idle[e.machineNum] = true;
 					Event crateScheduledSwap = new Event(currentTime,6,e.machineNum,null);
 					eventList.add(crateScheduledSwap);
 				} else {
@@ -457,7 +490,7 @@ public class Factory {
 				eventList.add(m4ScheduledFinished);
 			}
 		} else {
-			m4Idle[e.machineNum] = true;
+			//m4Idle[e.machineNum] = true;
 		}
 	}
 
@@ -474,8 +507,6 @@ public class Factory {
 			System.out.println("DVDs in buffer " + (i) + ": " + bufferList.get(i).size());
 		}
 		System.out.println("Total number of DVDs broken in machine 2: " + brokenDVDs);	
-		//System.out.println("Total number of DVDs finished in machine 2: " + m2DVDsFinished);
-		//System.out.println("Total number of DVDs finished cb: " + cbFinish);
 		System.out.println("DVDs on conveyor belt 0: " + cbWaitingDVD.get(0).size());
 		System.out.println("DVDs on conveyor belt 1: " + cbWaitingDVD.get(1).size());
 
@@ -511,17 +542,12 @@ public class Factory {
 				System.out.print("CB." + (i) + ", ");
 			}
 		}
-		for(int i = 0; i<amountM3; i++){
-			if (m3_3WaitingForSwap[i]){
-				System.out.print("M3." + (i) + ", ");
-			}
-		}
+		/*
 		for(int i = 0; i<amountM4; i++){
 			if (m4Idle[i]){
 				System.out.print("M4." + (i) + ", ");
 			}
-		}
-		
+		}*/
 		System.out.println();
 		System.out.print("Repairing machines are: ");
 		for(int i = 0; i<amountM1; i++) {
@@ -648,7 +674,7 @@ public class Factory {
 		shell.open();
 		shell.layout();
 		Image simImage = new Image(display,
-				   "/Users/Jiske/Pictures/simImage.png");
+				   "/Users/barendpoot/Pictures/simImage.png");
 		dvdFactoryImage.setImage(simImage);
 		init();
 
@@ -690,6 +716,11 @@ public class Factory {
 			cbtnIdleM2_1.setSelection(m2Idle[1]);
 			cbtnBusyM2_0.setSelection(m2Busy[0]);
 			cbtnBusyM2_1.setSelection(m2Busy[1]);
+			cbtnBusyM3.setSelection(m3_3WaitingForSwap[0]);
+			cbtnBusyM3_1.setSelection(m3_3WaitingForSwap[1]);
+			lblNozzlesBlocked0.setText("Nozzles blocked: " + m3_numBlockedNozzles[0]);
+			lblNozzlesBlocked1.setText("Nozzles blocked: " + m3_numBlockedNozzles[1]);
+
 			lblBrokenDVDs.setText("Broken DVDs: " + brokenDVDsint.toString());			
 			dvdProduced.setText("Dvd's produced: " + producedDVDs.toString());
 			if(m4Repairing[0]){
@@ -702,11 +733,10 @@ public class Factory {
 			} else {
 				lblCartridgeSize_1.setText("DVDs left before refill: " + cartridgeSize_1.toString());
 			}
-			//cbtnCleaningM4_0.setSelection(m3);
-			//cbtnCleaningM4_1.setSelection(m3);
+
 			
-			cbtnRefillM4_0.setSelection(m4Repairing[1]);
-			cbtnRefillM4_1.setSelection(m4Repairing[0]);
+			cbtnRefillM4_0.setSelection(m4Repairing[0]);
+			cbtnRefillM4_1.setSelection(m4Repairing[1]);
 			lblCurrentTime.setText("Current time: " + currentTime0.toString());
 			
 			
@@ -843,26 +873,17 @@ public class Factory {
 		cbtnBusyM2_1.setText("Busy");
 		
 		lblCartridgeSize_0 = new Label(shell, SWT.NONE);
-		lblCartridgeSize_0.setBounds(910, 471, 200, 14);
+		lblCartridgeSize_0.setBounds(910, 221, 200, 14);
 		lblCartridgeSize_0.setText("DVDs left before refill: 0");
 		
 		lblCartridgeSize_1 = new Label(shell, SWT.NONE);
-		lblCartridgeSize_1.setBounds(910, 221, 200, 14);
+		lblCartridgeSize_1.setBounds(910, 471, 200, 14);
 		lblCartridgeSize_1.setText("DVDs left before refill: 0");
 		
 		lblBrokenDVDs = new Label(shell, SWT.NONE);
 		lblBrokenDVDs.setBounds(359, 298, 116, 14);
 		lblBrokenDVDs.setText("Broken DVDs: 0");
-		
-		/*
-		cbtnCleaningM4_0 = new Button(shell, SWT.CHECK);
-		cbtnCleaningM4_0.setBounds(648, 218, 94, 18);
-		cbtnCleaningM4_0.setText("Cleaning");
-		
-		cbtnCleaningM4_1 = new Button(shell, SWT.CHECK);
-		cbtnCleaningM4_1.setBounds(648, 468, 94, 18);
-		cbtnCleaningM4_1.setText("Cleaning");
-		*/
+	
 		cbtnRefillM4_0 = new Button(shell, SWT.CHECK);
 		cbtnRefillM4_0.setBounds(938, 118, 94, 18);
 		cbtnRefillM4_0.setText("Refill");
@@ -874,6 +895,22 @@ public class Factory {
 		lblCurrentTime = new Label(shell, SWT.NONE);
 		lblCurrentTime.setBounds(211, 60, 200, 14);
 		lblCurrentTime.setText("Current Time: 0");
+		
+		cbtnBusyM3 = new Button(shell, SWT.CHECK);
+		cbtnBusyM3.setBounds(647, 218, 150, 18);
+		cbtnBusyM3.setText("Waiting for swap");
+		
+		cbtnBusyM3_1 = new Button(shell, SWT.CHECK);
+		cbtnBusyM3_1.setBounds(647, 467, 150, 18);
+		cbtnBusyM3_1.setText("Waiting for swap");
+		
+		lblNozzlesBlocked0 = new Label(shell, SWT.NONE);
+		lblNozzlesBlocked0.setBounds(647, 235, 200, 14);
+		lblNozzlesBlocked0.setText("Nozzles blocked: 0");
+		
+		lblNozzlesBlocked1 = new Label(shell, SWT.NONE);
+		lblNozzlesBlocked1.setBounds(647, 485, 200, 14);
+		lblNozzlesBlocked1.setText("Nozzles blocked: 0");
 		
 		dvdFactoryImage = new Label(shell, SWT.NONE);
 		dvdFactoryImage.setBounds(0, 0, 1096, 550);
@@ -922,7 +959,6 @@ public class Factory {
 	public Button getCbtnIdleM1_3() {
 		return cbtnIdleM1_3;
 	}
-	
 	public Button getCbtnRepairingM1_0() {
 		return cbtnRepairingM1_0;
 	}
@@ -956,12 +992,6 @@ public class Factory {
 	public Label getLblCartridgeSize_1() {
 		return lblCartridgeSize_1;
 	}
-	public Button getCbtnCleaningM4_0() {
-		return cbtnCleaningM4_0;
-	}
-	public Button getCbtnCleaningM4_1() {
-		return cbtnCleaningM4_1;
-	}
 	public Button getCbtnRefillM4_0() {
 		return cbtnRefillM4_0;
 	}
@@ -970,5 +1000,17 @@ public class Factory {
 	}
 	public Label getLblCurrentTime() {
 		return lblCurrentTime;
+	}
+	public Button getCbtnBusyM3() {
+		return cbtnBusyM3;
+	}
+	public Button getCbtnBusyM3_1() {
+		return cbtnBusyM3_1;
+	}
+	public Label getLblNozzlesBlocked0() {
+		return lblNozzlesBlocked0;
+	}
+	public Label getLblNozzlesBlocked1() {
+		return lblNozzlesBlocked1;
 	}
 }
