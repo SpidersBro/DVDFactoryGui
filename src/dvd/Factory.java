@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Button;
 
 
 
-
 public class Factory {
 	
 /////-------------------------------------------- Testing	-------------------------------\\\\\\\\\\	
@@ -649,7 +648,7 @@ public class Factory {
 		shell.open();
 		shell.layout();
 		Image simImage = new Image(display,
-				   "/Users/barendpoot/Pictures/simImage.png");
+				   "/Users/Jiske/Pictures/simImage.png");
 		dvdFactoryImage.setImage(simImage);
 		init();
 
