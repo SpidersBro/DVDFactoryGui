@@ -147,12 +147,12 @@ public class Factory {
 	public static double totalM3IdleBackTime = 0.0;
 	public static double totalM3IdleTime = 0.0;
 	public static double totalM4IdleTime = 0.0;
-	public static double m1IdleTime = 0.0;
-	public static double m2IdleFrontTime = 0.0;
-	public static double m2IdleBackTime = 0.0;
-	public static double m3IdleFrontTime = 0.0;
-	public static double m3IdleBackTime = 0.0;
-	public static double m4IdleTime = 0.0;
+	public static double[] m1IdleTime = new double[amountM1];
+	public static double[] m2IdleFrontTime = new double[amountM2];
+	public static double[] m2IdleBackTime = new double[amountM2];
+	public static double[] m3IdleFrontTime = new double[amountM3];
+	public static double[] m3IdleBackTime = new double[amountM3];
+	public static double[] m4IdleTime = new double[amountM4];
 	public static boolean[] prevM1Idle = new boolean[amountM1];
 	public static boolean[] prevM2IdleFront = new boolean[amountM2];
 	public static boolean[] prevM2IdleBack = new boolean[amountM2];
@@ -166,6 +166,15 @@ public class Factory {
 	public static double totalM1RepairTime = 0.0;
 	public static double totalM3CleaneTime = 0.0;
 	public static double totalM4RefillTime = 0.0;
+	private Label lblThroughputTime;
+	private Label lblDvdsProducedPer;
+	private Label lblIdleTimeM1;
+	private Label lblIdleTimeFrontM2;
+	private Label lblPerformanceMeasures;
+	private Label lblIdleTimeBackM2;
+	private Label lblIdleTimeMachineM3;
+	private Label lblIdleTimeMachineM2;
+	private Label lblIdleTimeMachineM4;
 	
 	
 	
@@ -727,22 +736,35 @@ public class Factory {
 		if(!producedDVDList.isEmpty()) {
 			averageThroughputTime = totalThroughputTime/ producedDVDList.size();
 		}
-		System.out.println(averageThroughputTime);
+	//	System.out.println(averageThroughputTime);
 	}
 	
 	public static void dvdProductionPerHour(){
 		avgDVDPerHour = producedDVDList.size() / (currentTime/3600);
-		System.out.println(avgDVDPerHour);
+		//System.out.println(avgDVDPerHour);
 	}
 	
-	public static double idleTime(int machineNum, boolean[] prevIdle, boolean[] Idle, double idleTime, double totalIdleTime){
+	public static double idleTime(int machineNum, boolean[] prevIdle, boolean[] Idle, double[] idleTime, double totalIdleTime, int machine){
 		for(int i =0; i < machineNum; i++){
-			if(!prevIdle[i] && Idle[i]){
+			if(!(prevIdle[i]) && (Idle[i])){
+				System.out.println(machine + "becomes Idle");
 				prevIdle[i] = true;
-				idleTime = currentTime;
-			if(prevIdle[i] && !Idle[i]){
+				switch(machine){
+					case 1: m1IdleTime[i] = currentTime; 
+							break;
+					case 2: m2IdleFrontTime[i] = currentTime;
+							break;
+					case 3: m3IdleFrontTime[i] = currentTime;
+							break;
+					case 4 :m4IdleTime[i] = currentTime;
+							break;
+					default:m2IdleBackTime[i] = currentTime;
+							break;
+				}
+			if((prevIdle[i]) && !(Idle[i])){
+				System.out.println(machine + "becomes not Idle");
 					prevIdle[i] = false;
-					totalIdleTime += (currentTime - idleTime);
+					totalIdleTime += (currentTime - idleTime[i]);
 				}
 			}
 		}
@@ -766,7 +788,7 @@ public class Factory {
 	}
 
 	public static void nextEvent(){
-		//dvdProductionPerHour();
+		dvdProductionPerHour();
 		Event e = eventList.remove();
 		switch(e.eventStep) {
 		case 1: m1ScheduledFinished(e); 
@@ -797,14 +819,14 @@ public class Factory {
 				break;
 		default: System.out.println("What's happening?!?!");
 		}
-		totalM1IdleTime = idleTime(amountM1, prevM1Idle, m1Idle, m1IdleTime, totalM1IdleTime);
-		totalM2IdleFrontTime = idleTime(amountM2, prevM2IdleFront, m2IdleFront, m2IdleFrontTime, totalM2IdleFrontTime);
-		totalM2IdleBackTime = idleTime(amountM2, prevM2IdleBack, m2IdleBack, m2IdleBackTime, totalM2IdleBackTime);
+		totalM1IdleTime = idleTime(amountM1, prevM1Idle, m1Idle, m1IdleTime, totalM1IdleTime,1);
+		totalM2IdleFrontTime = idleTime(amountM2, prevM2IdleFront, m2IdleFront, m2IdleFrontTime, totalM2IdleFrontTime,2);
+		totalM2IdleBackTime = idleTime(amountM2, prevM2IdleBack, m2IdleBack, m2IdleBackTime, totalM2IdleBackTime,5);
 		totalM2IdleTime = totalM2IdleFrontTime + totalM2IdleBackTime;
-		totalM3IdleFrontTime = idleTime(amountM3, prevM3IdleFront, m3_3WaitingForSwap, m3IdleFrontTime, totalM3IdleFrontTime);
+		totalM3IdleFrontTime = idleTime(amountM3, prevM3IdleFront, m3_3WaitingForSwap, m3IdleFrontTime, totalM3IdleFrontTime,3);
 		//totalM3IdleBackTime = idleTime(amountM3, prevM3IdleBack, m3IdleBack, m3IdleBackTime, totalM3IdleBackTime);
-		totalM3IdleTime = totalM3IdleFrontTime + totalM3IdleBackTime;
-		totalM4IdleTime = idleTime(amountM4, prevM4Idle, m4Idle, m4IdleTime, totalM4IdleTime);
+		//totalM3IdleTime = totalM3IdleFrontTime + totalM3IdleBackTime;
+		totalM4IdleTime = idleTime(amountM4, prevM4Idle, m4Idle, m4IdleTime, totalM4IdleTime,4);
 	}
 	
 
@@ -825,6 +847,11 @@ public class Factory {
 		Image simImage = new Image(display,
 				   "/Users/Jiske/Pictures/simImage.png");
 		dvdFactoryImage.setImage(simImage);
+		
+		
+		
+		
+		
 		init();
 
 		
@@ -869,7 +896,20 @@ public class Factory {
 			cbtnBusyM3_1.setSelection(m3_3WaitingForSwap[1]);
 			lblNozzlesBlocked0.setText("Nozzles blocked: " + m3_numBlockedNozzles[0]);
 			lblNozzlesBlocked1.setText("Nozzles blocked: " + m3_numBlockedNozzles[1]);
-
+			lblThroughputTime.setText("Average throughput time in minutes: " + averageThroughputTime/60);
+			lblDvdsProducedPer.setText("Average DVD production per  hour: " + avgDVDPerHour);
+			lblIdleTimeM1.setText("Idle time machine 1: " + totalM1IdleTime);
+			lblIdleTimeFrontM2.setText("Idle time front machine 2: " + totalM2IdleFrontTime);
+			lblIdleTimeBackM2.setText("Idle time back machine 2: "+ totalM2IdleBackTime);
+			lblIdleTimeMachineM2.setText("Idle time machine 2: "+ totalM2IdleTime);
+			lblIdleTimeMachineM3.setText("Idle time machine 3: "+ totalM3IdleFrontTime);
+			lblIdleTimeMachineM4.setText("Idle time machine 4: "+ totalM4IdleTime);
+			
+			
+			
+			
+			
+			
 			lblBrokenDVDs.setText("Broken DVDs: " + brokenDVDsint.toString());			
 			dvdProduced.setText("Dvd's produced: " + producedDVDs.toString());
 			if(m4Repairing[0]){
@@ -903,7 +943,7 @@ public class Factory {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(1096, 570);
+		shell.setSize(1096, 800);
 		shell.setText("DVD Factory");
 		
 		dvdProduced = new Label(shell, SWT.NONE);
@@ -1072,6 +1112,44 @@ public class Factory {
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
 		label.setBounds(0, 30, 1096, 2);
 		
+
+		lblPerformanceMeasures = new Label(shell, SWT.NONE);
+		lblPerformanceMeasures.setBounds(32, 561, 200, 14);
+		lblPerformanceMeasures.setText("Performance measures:");	
+		
+		lblThroughputTime = new Label(shell, SWT.NONE);
+		lblThroughputTime.setBounds(32, 622, 286, 14);
+		lblThroughputTime.setText("Average throughput time in minutes: 0");
+		
+		lblDvdsProducedPer = new Label(shell, SWT.NONE);
+		lblDvdsProducedPer.setBounds(32, 602, 271, 14);
+		lblDvdsProducedPer.setText("Average DVD production per  hour: 0");
+		
+		lblIdleTimeM1 = new Label(shell, SWT.NONE);
+		lblIdleTimeM1.setBounds(32, 639, 146, 14);
+		lblIdleTimeM1.setText("Idle time machine 1: 0");
+		
+		lblIdleTimeFrontM2 = new Label(shell, SWT.NONE);
+		lblIdleTimeFrontM2.setBounds(32, 653, 232, 14);
+		lblIdleTimeFrontM2.setText("Idle time front machine 2: 0");
+
+		lblIdleTimeBackM2 = new Label(shell, SWT.NONE);
+		lblIdleTimeBackM2.setBounds(32, 673, 216, 14);
+		lblIdleTimeBackM2.setText("Idle time back machine 2: 0");
+		
+		lblIdleTimeMachineM2 = new Label(shell, SWT.NONE);
+		lblIdleTimeMachineM2.setBounds(32, 693, 186, 14);
+		lblIdleTimeMachineM2.setText("Idle time machine 2: 0 ");
+		
+		lblIdleTimeMachineM3 = new Label(shell, SWT.NONE);
+		lblIdleTimeMachineM3.setBounds(32, 713, 168, 14);
+		lblIdleTimeMachineM3.setText("Idle time machine 3: 0");
+		
+		lblIdleTimeMachineM4 = new Label(shell, SWT.NONE);
+		lblIdleTimeMachineM4.setBounds(32, 728, 168, 14);
+		lblIdleTimeMachineM4.setText("Idle time machine 4: 0 ");
+		
+		
 		dvdFactoryImage = new Label(shell, SWT.NONE);
 		dvdFactoryImage.setBounds(0, 0, 1096, 550);
 
@@ -1174,5 +1252,29 @@ public class Factory {
 	}
 	public Button getBtnNextEvent() {
 		return btnNextEvent;
+	}
+	public Label getLblThroughputTime() {
+		return lblThroughputTime;
+	}
+	public Label getLblDvdsProducedPer() {
+		return lblDvdsProducedPer;
+	}
+	public Label getLblIdleTimeM1() {
+		return lblIdleTimeM1;
+	}
+	public Label getLblIdleTimeFrontM2() {
+		return lblIdleTimeFrontM2;
+	}
+	public Label getLblIdleTimeBackM2() {
+		return lblIdleTimeBackM2;
+	}
+	public Label getLblIdleTimeMachineM2() {
+		return lblIdleTimeMachineM2;
+	}
+	public Label getLblIdleTimeMachineM3() {
+		return lblIdleTimeMachineM3;
+	}
+	public Label getLblIdleTimeMachineM4() {
+		return lblIdleTimeMachineM4;
 	}
 }
