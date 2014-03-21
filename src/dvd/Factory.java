@@ -98,6 +98,7 @@ public class Factory {
 
 	// state for all machines 2
 	public static boolean[] m2Idle = new boolean[amountM2];
+	public static boolean[] m2IdleFront = new boolean[amountM2];
 	public static ArrayList<DVD> m2WaitingDVD = new ArrayList<DVD>();
 	public static boolean[] m2Busy = new boolean[amountM2]; //!!!!! nieuw
 	
@@ -134,8 +135,37 @@ public class Factory {
 	// variables needed for performance measure
 	public static double totalThroughputTime = 0.0;
 	public static double averageThroughputTime = 0.0;
+	
 	public static double avgDVDPerHour = 0.0;
 	public static ArrayList<DVD> producedDVDList = new ArrayList<DVD>();
+	
+	public static double totalM1IdleTime = 0.0;
+	public static double totalM2IdleFrontTime = 0.0;
+	public static double totalM2IdleBackTime = 0.0;
+	public static double totalM2IdleTime = 0.0;
+	public static double totalM3IdleFrontTime = 0.0;
+	public static double totalM3IdleBackTime = 0.0;
+	public static double totalM3IdleTime = 0.0;
+	public static double totalM4IdleTime = 0.0;
+	public static double m1IdleTime = 0.0;
+	public static double m2IdleFrontTime = 0.0;
+	public static double m2IdleBackTime = 0.0;
+	public static double m3IdleFrontTime = 0.0;
+	public static double m3IdleBackTime = 0.0;
+	public static double m4IdleTime = 0.0;
+	public static boolean[] prevM1Idle = new boolean[amountM1];
+	public static boolean[] prevM2IdleFront = new boolean[amountM2];
+	public static boolean[] prevM2IdleBack = new boolean[amountM2];
+	public static boolean[] prevM3IdleFront = new boolean[amountM3];
+	public static boolean[] prevM3IdleBack = new boolean[amountM3];
+	public static boolean[] prevM4Idle = new boolean[amountM4];
+	public static boolean[] m2IdleBack = new boolean[amountM2];
+	public static boolean[] m3IdleFront = new boolean[amountM3];
+	public static boolean[] m3IdleBack = new boolean[amountM3];
+	
+	public static double totalM1RepairTime = 0.0;
+	public static double totalM3CleaneTime = 0.0;
+	public static double totalM4RefillTime = 0.0;
 	
 	
 	
@@ -151,6 +181,7 @@ public class Factory {
 			m1Repairing[i] = false;
 			m1Idle[i] = false;
 			m1RestTime[i] = 0;
+			prevM1Idle[i] = false;
 			
 			DVD dvd = new DVD(0,0);
 			Event m1FinishedEvent = new Event((currentTime+eventTimeM1()),1,i,dvd);
@@ -166,6 +197,10 @@ public class Factory {
 		for ( int i = 0; i < amountM2; i++){
 			cbIdle[i] = false;
 			m2Idle[i] = false;
+			m2IdleFront[i] = false;
+			m2IdleBack[i] = false;
+			prevM2IdleFront[i] = false;
+			prevM2IdleBack[i] = false;
 			m2Busy[i] = false;
 			//cbWaitingForSwap[i] = false;
 			Queue<DVD> buffer = new LinkedList<DVD>();
@@ -179,6 +214,10 @@ public class Factory {
 		
 		// All crates are empty
 		for ( int i = 0; i < amountM3; i++){
+			m3IdleFront[i] = false;
+			m3IdleBack[i] = false;
+			prevM3IdleFront[i] = false;
+			prevM3IdleBack[i] = false;
 			m3_3WaitingForSwap[i] = false;
 			ArrayList<DVD> crateFront = new ArrayList<DVD>();
 			ArrayList<DVD> crateIn = new ArrayList<DVD>();
@@ -191,6 +230,8 @@ public class Factory {
 		
 		// ProductionStep 4 is running, and cartridgeSize is initialized
 		for ( int i = 0; i < amountM4; i++){
+			m4Idle[i] = false;
+			prevM4Idle[i] = false;
 			m4Repairing[i] = false;
 			//m4Idle[i] = true;
 			cartridge[i] = getCartridgeSize();
@@ -294,9 +335,7 @@ public class Factory {
 			if (dvdBrokenRand > .02) { // DVDs to conveyor belt
 				Event cbScheduledFinished = new Event((currentTime+(5*60)),5,e.machineNum,e.dvd);
 				eventList.add(cbScheduledFinished);
-			} else { 
-				// delete DVD
-				// e.dvd = null; // Jiske: volgens mij niet nodig 
+			} else { // Broken DVDs
 				brokenDVDs++;
 			}
 			// In case any M1 of this M2 is Idle	
@@ -328,9 +367,12 @@ public class Factory {
 				Event m2Finished = new Event(eventTimeM2(),4,e.machineNum,new_dvd);
 				eventList.add(m2Finished);
 				m2Busy[e.machineNum] = true;
+			} else {
+				m2IdleFront[e.machineNum] = true;
 			}
 		// If conveyor belt is idle set true
 		} else {
+			m2IdleBack[e.machineNum] = true;
 			m2Idle[e.machineNum] = true;
 			m2WaitingDVD.set(e.machineNum, e.dvd);
 		}
@@ -383,12 +425,11 @@ public class Factory {
 					 * OR
 					 */			
 					if(  crateBackList.get(k).isEmpty() && crateInList.get(j).size() == 20 && m3_3WaitingForSwap[j]) {
-						
 						//Swap crateBack and CrateIn
 						tempCrateIn = (ArrayList<DVD>) crateInList.get(j).clone();
 						crateBackList.set(k,tempCrateIn);
 						crateInList.get(j).clear();
-					
+						
 						//If M4 is not repairing, it should now start again.
 						if(!m4Repairing[k]) {
 							Event m4ScheduledFinished = new Event(eventTimeM4(),9,k,null);
@@ -396,6 +437,7 @@ public class Factory {
 						}
 						
 						m3_3WaitingForSwap[j] = false;
+						m4Idle[e.machineNum] = false;
 						
 					}
 					
@@ -426,6 +468,7 @@ public class Factory {
 						// If the conveyorbelt starts up again, so should M2.
 						if(m2Idle[i]) {
 							m2Idle[i] = false;
+							m2IdleBack[i] = false;
 							if ( m2WaitingDVD.get(i) == null) {
 								System.out.println("The dvd from m2WaitingDVD is null");
 							}
@@ -434,6 +477,7 @@ public class Factory {
 							
 						} else if(!bufferList.get(i).isEmpty()){
 							m2Idle[i] = false;
+							m2IdleBack[i] = false;
 							Event m2ScheduledFinished = new Event(eventTimeM2(),4,i,bufferList.get(i).remove());
 							eventList.add(m2ScheduledFinished);
 						}
@@ -442,7 +486,7 @@ public class Factory {
 						Event m3_12ScheduledFinished = new Event(eventTimeM3_12(),7,j,null);
 						eventList.add(m3_12ScheduledFinished);
 						
-					}	
+					}
 				}
 			}
 		}
@@ -472,7 +516,7 @@ public class Factory {
                             m3_numBlockedNozzles[e.machineNum]++;
                     }
             }
-            
+            totalM3CleaneTime =+ delay; // for perfomance measure 
             Event m3_3Finished = new Event((eventTimeM3_3()+delay),8,e.machineNum,null);
             eventList.add(m3_3Finished);
             
@@ -493,8 +537,6 @@ public class Factory {
 			if (countDVDs[e.machineNum] < cartridge[e.machineNum] ) {
 				countDVDs[e.machineNum]++;
 
-				
-			
 				DVD this_dvd = crateBackList.get(e.machineNum).remove(0);
 
 				crateBackList.get(e.machineNum).trimToSize();
@@ -519,7 +561,9 @@ public class Factory {
 				Event m4ScheduledFinished = new Event(eventTimeM4()+eventTimeM4Refill(),9,e.machineNum,null);
 				eventList.add(m4ScheduledFinished);
 			}
-		} 
+		} else {
+			m4Idle[e.machineNum] = true;
+		}
 	}
 
 	
@@ -610,7 +654,9 @@ public class Factory {
 	
 	private static double eventTimeStartRepairM1() {
 		ExponentialDistribution exp = new ExponentialDistribution(8*60*60);
-		return currentTime + exp.sample();
+		double repairM1 = exp.sample();
+		totalM1RepairTime =+ repairM1;
+		return currentTime + repairM1;
 	}
 	
 	private static double eventTimeM1FinishedRepair() {
@@ -665,9 +711,10 @@ public class Factory {
 		}
 	}
 	
-	
 	private static double eventTimeM4Refill() {
 		NormalDistribution normalDis = new NormalDistribution(900, 60);
+		double m4RefillTime = normalDis.sample();
+		totalM4RefillTime += m4RefillTime;
 		return  normalDis.sample();
 	}
 
@@ -687,7 +734,20 @@ public class Factory {
 		avgDVDPerHour = producedDVDList.size() / (currentTime/3600);
 		System.out.println(avgDVDPerHour);
 	}
-
+	
+	public static double idleTime(int machineNum, boolean[] prevIdle, boolean[] Idle, double idleTime, double totalIdleTime){
+		for(int i =0; i < machineNum; i++){
+			if(!prevIdle[i] && Idle[i]){
+				prevIdle[i] = true;
+				idleTime = currentTime;
+			if(prevIdle[i] && !Idle[i]){
+					prevIdle[i] = false;
+					totalIdleTime += (currentTime - idleTime);
+				}
+			}
+		}
+		return totalIdleTime;
+	}
 	
 	
 /////---------------------------------------- Main loop ----------------------------------\\\\\\\\\
@@ -736,10 +796,20 @@ public class Factory {
 		case 10:hourCheck(e);
 				break;
 		default: System.out.println("What's happening?!?!");
-		
 		}
-	
+		totalM1IdleTime = idleTime(amountM1, prevM1Idle, m1Idle, m1IdleTime, totalM1IdleTime);
+		totalM2IdleFrontTime = idleTime(amountM2, prevM2IdleFront, m2IdleFront, m2IdleFrontTime, totalM2IdleFrontTime);
+		totalM2IdleBackTime = idleTime(amountM2, prevM2IdleBack, m2IdleBack, m2IdleBackTime, totalM2IdleBackTime);
+		totalM2IdleTime = totalM2IdleFrontTime + totalM2IdleBackTime;
+		totalM3IdleFrontTime = idleTime(amountM3, prevM3IdleFront, m3_3WaitingForSwap, m3IdleFrontTime, totalM3IdleFrontTime);
+		//totalM3IdleBackTime = idleTime(amountM3, prevM3IdleBack, m3IdleBack, m3IdleBackTime, totalM3IdleBackTime);
+		totalM3IdleTime = totalM3IdleFrontTime + totalM3IdleBackTime;
+		totalM4IdleTime = idleTime(amountM4, prevM4Idle, m4Idle, m4IdleTime, totalM4IdleTime);
 	}
+	
+
+	
+	
 	
 	
 /////------------------------------------  GUI  --------------------------------\\\\\\\\\
@@ -753,7 +823,7 @@ public class Factory {
 		shell.open();
 		shell.layout();
 		Image simImage = new Image(display,
-				   "/Users/barendpoot/Pictures/simImage.png");
+				   "/Users/Jiske/Pictures/simImage.png");
 		dvdFactoryImage.setImage(simImage);
 		init();
 
