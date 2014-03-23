@@ -20,13 +20,7 @@ public class DVDFactory {
 	public static int repairNumber = 0;
 	public static int dvdsM2 = 0;
 	public static int brokenDVDs = 0;
-	public static int hour = 0;
-	public static int m2Int = 0;
-	public static int cbInt = 0;
-	public static int m3_12Int = 0;
-	public static int m3_3Int = 0;
-	public static int m4Int = 0;
-	public static int cSwapInt = 0;
+
 	
 	
 /////------------------------------------ Declarations and init() --------------------------\\\\\\\\\
@@ -36,7 +30,7 @@ public class DVDFactory {
 
 	// These are the variables we can increase or decrease and may  the production.
 	public static double currentTime = 0;
-	public static int bufferSize = 20;
+	public static int bufferSize = 0;
 	public static int crateSize = 20;
 	public static int amountM1 = 4;
 	public static int amountM2 = 2;
@@ -111,12 +105,7 @@ public class DVDFactory {
 	public static double[] m3IdleFrontTime = new double[amountM3];
 	public static double[] m3IdleBackTime = new double[amountM3];
 	public static double[] m4IdleTime = new double[amountM4];
-	public static boolean[] prevM1Idle = new boolean[amountM1];
-	public static boolean[] prevM2IdleFront = new boolean[amountM2];
-	public static boolean[] prevM2IdleBack = new boolean[amountM2];
-	public static boolean[] prevM3IdleFront = new boolean[amountM3];
-	public static boolean[] prevM3IdleBack = new boolean[amountM3];
-	public static boolean[] prevM4Idle = new boolean[amountM4];
+
 	public static boolean[] m2IdleBack = new boolean[amountM2];
 	public static boolean[] m3IdleFront = new boolean[amountM3];
 	public static boolean[] m3IdleBack = new boolean[amountM3];
@@ -141,7 +130,6 @@ public class DVDFactory {
 			m1Idle[i] = false;
 			m1IdleTime[i] = 0;
 			m1RestTime[i] = 0;
-			prevM1Idle[i] = false;
 			totalM1IdleTime = 0;
 			DVD dvd = new DVD(0,0);
 			Event m1FinishedEvent = new Event((currentTime+eventTimeM1()),1,i,dvd);
@@ -159,8 +147,6 @@ public class DVDFactory {
 			m2Idle[i] = false;
 			m2IdleFront[i] = false;
 			m2IdleBack[i] = false;
-			prevM2IdleFront[i] = false;
-			prevM2IdleBack[i] = false;
 			m2Busy[i] = false;
 			//cbWaitingForSwap[i] = false;
 			Queue<DVD> buffer = new LinkedList<DVD>();
@@ -176,8 +162,6 @@ public class DVDFactory {
 		for ( int i = 0; i < amountM3; i++){
 			m3IdleFront[i] = false;
 			m3IdleBack[i] = false;
-			prevM3IdleFront[i] = false;
-			prevM3IdleBack[i] = false;
 			m3_3WaitingForSwap[i] = false;
 			ArrayList<DVD> crateFront = new ArrayList<DVD>();
 			ArrayList<DVD> crateIn = new ArrayList<DVD>();
@@ -191,7 +175,6 @@ public class DVDFactory {
 		// ProductionStep 4 is running, and cartridgeSize is initialized
 		for ( int i = 0; i < amountM4; i++){
 			m4Idle[i] = false;
-			prevM4Idle[i] = false;
 			m4Repairing[i] = false;
 			//m4Idle[i] = true;
 			cartridge[i] = getCartridgeSize();
@@ -203,7 +186,7 @@ public class DVDFactory {
 		
 		// This is the ending event. It is currently set at 7 days.
 		// TODO: Remove
-		Event endSimulationEvent = new Event((7*24*60*60),11,0,null);
+		Event endSimulationEvent = new Event((52*7*24*60*60),11,0,null);
 		eventList.add(endSimulationEvent);
 		
 	}
@@ -649,22 +632,16 @@ public class DVDFactory {
 		case 3: m1FinishedRepairing(e);
 				break;
 		case 4: m2ScheduledFinished(e);
-				m2Int++;
 				break;
 		case 5: cbScheduledFinished(e);
-				cbInt++;
 				break;
 		case 6: cratesScheduledSwap(e);
-				cSwapInt++;
 				break;
 		case 7: m3_12ScheduledFinished(e);
-				m3_12Int++;
 				break;
 		case 8: m3_3ScheduledFinished(e);
-				m3_3Int++;
 				break;
 		case 9: m4ScheduledFinished(e);
-				m4Int++;
 				break;
 		case 11:finishedSimulation(e);
 				break;
@@ -673,14 +650,7 @@ public class DVDFactory {
 		dvdProductionPerHour();
         totalM1IdleTime = idleTime(m1IdleTime, totalM1IdleTime, m1Idle);
         totalM2IdleTime = idleTime(m2IdleTime, totalM2IdleTime, m2Idle);
-		//totalM1IdleTime = idleTime(amountM1, prevM1Idle, m1Idle, m1IdleTime, totalM1IdleTime,1);
-		//totalM2IdleFrontTime = idleTime(amountM2, prevM2IdleFront, m2IdleFront, m2IdleFrontTime, totalM2IdleFrontTime,2);
-		//totalM2IdleBackTime = idleTime(amountM2, prevM2IdleBack, m2IdleBack, m2IdleBackTime, totalM2IdleBackTime,5);
-		//totalM2IdleTime = totalM2IdleFrontTime + totalM2IdleBackTime;
-		//totalM3IdleFrontTime = idleTime(amountM3, prevM3IdleFront, m3_3WaitingForSwap, m3IdleFrontTime, totalM3IdleFrontTime,3);
-		//totalM3IdleBackTime = idleTime(amountM3, prevM3IdleBack, m3IdleBack, m3IdleBackTime, totalM3IdleBackTime);
-		//totalM3IdleTime = totalM3IdleFrontTime + totalM3IdleBackTime;
-		//totalM4IdleTime = idleTime(amountM4, prevM4Idle, m4Idle, m4IdleTime, totalM4IdleTime,4);
+		
 	}
 	
 	
