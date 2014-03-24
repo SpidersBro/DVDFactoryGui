@@ -60,6 +60,9 @@ public class GUI {
 		private Label lblIdleTimeMachineM3;
 		private Label lblIdleTimeMachineM2;
 		private Label lblIdleTimeMachineM4;
+		private Label lblIdleTimeConveyor;
+		private Label lblIdleTimeFrontM3;
+		private Label lblIdleTimeBackM3;
 		
 		
 
@@ -93,6 +96,8 @@ public class GUI {
 		Image simImage = new Image(display,
 				   "./img/simImage.png");
 		dvdFactoryImage.setImage(simImage);
+		
+		
 		DVDFactory.init();
 
 		
@@ -132,22 +137,25 @@ public class GUI {
 			cbtnRepairingM1_1.setSelection(DVDFactory.m1Repairing[1]);
 			cbtnRepairingM1_2.setSelection(DVDFactory.m1Repairing[2]);
 			cbtnRepairingM1_3.setSelection(DVDFactory.m1Repairing[3]);
-			cbtnIdleM2_0.setSelection(DVDFactory.m2Idle[0]);
-			cbtnIdleM2_1.setSelection(DVDFactory.m2Idle[1]);
+			cbtnIdleM2_0.setSelection(DVDFactory.m2IdleFront[0]||DVDFactory.m2IdleBack[0]);
+			cbtnIdleM2_1.setSelection(DVDFactory.m2IdleFront[0]||DVDFactory.m2IdleBack[0]);
 			cbtnBusyM2_0.setSelection(DVDFactory.m2Busy[0]);
 			cbtnBusyM2_1.setSelection(DVDFactory.m2Busy[1]);
 			cbtnBusyM3.setSelection(DVDFactory.m3_3WaitingForSwap[0]);
 			cbtnBusyM3_1.setSelection(DVDFactory.m3_3WaitingForSwap[1]);
 			lblNozzlesBlocked0.setText("Nozzles blocked: " + DVDFactory.m3_numBlockedNozzles[0]);
 			lblNozzlesBlocked1.setText("Nozzles blocked: " + DVDFactory.m3_numBlockedNozzles[1]);
-			lblThroughputTime.setText("Average throughput time in minutes: " + DVDFactory.averageThroughputTime/60);
-			lblDvdsProducedPer.setText("Average DVD production per  hour: " + DVDFactory.avgDVDPerHour);
-			lblIdleTimeM1.setText("Idle time machine 1: " + df.format(DVDFactory.totalM1IdleTime/DVDFactory.currentTime) + "%");
-			lblIdleTimeFrontM2.setText("Idle time machine 2: " + df.format(DVDFactory.totalM2IdleTime/DVDFactory.currentTime) + "%");
-			//lblIdleTimeBackM2.setText("Idle time back machine 2: "+ totalM2IdleBackTime);
-			//lblIdleTimeMachineM2.setText("Idle time machine 2: "+ totalM2IdleTime);
-			//lblIdleTimeMachineM3.setText("Idle time machine 3: "+ totalM3IdleFrontTime);
-			//lblIdleTimeMachineM4.setText("Idle time machine 4: "+ totalM4IdleTime);
+			lblThroughputTime.setText("Average throughput time in minutes: " + df.format(DVDFactory.averageThroughputTime/60));
+			lblDvdsProducedPer.setText("Average DVD production per  hour: " + df.format(DVDFactory.avgDVDPerHour));
+			lblIdleTimeM1.setText("Average idle time machine 1: "+  df.format(DVDFactory.totalM1IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM1) + "%");
+			lblIdleTimeMachineM2.setText("Idle time machine 2: " + df.format(DVDFactory.totalM2IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");
+			lblIdleTimeFrontM2.setText("Idle time front machine 2: "+ df.format(DVDFactory.totalM2IdleFrontTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");
+			lblIdleTimeBackM2.setText("Idle time back machine 2: "+ df.format(DVDFactory.totalM2IdleBackTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");
+			lblIdleTimeConveyor.setText("Idle time conveyor belt: " + df.format(DVDFactory.totalCBIdleTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");
+			lblIdleTimeMachineM3.setText("Idle time machine 3: "+ df.format(DVDFactory.totalM3IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM3) + "%");
+			lblIdleTimeFrontM3.setText("Idle time front machine 3: "+ df.format(DVDFactory.totalM3IdleFrontTime/DVDFactory.currentTime*100/DVDFactory.amountM3) + "%");
+			lblIdleTimeBackM3.setText("Idle time Back machine 3: "+ df.format(DVDFactory.totalM3IdleBackTime/DVDFactory.currentTime*100/DVDFactory.amountM3) + "%");
+			lblIdleTimeMachineM4.setText("Idle time machine 4: "+ df.format(DVDFactory.totalM4IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM4) + "%");
 			
 			
 			
@@ -363,36 +371,49 @@ public class GUI {
 		lblPerformanceMeasures.setText("Performance measures:");	
 		
 		lblThroughputTime = new Label(shell, SWT.NONE);
-		lblThroughputTime.setBounds(32, 622, 286, 14);
+		lblThroughputTime.setBounds(32, 601, 286, 14);
 		lblThroughputTime.setText("Average throughput time in minutes: 0");
 		
 		lblDvdsProducedPer = new Label(shell, SWT.NONE);
-		lblDvdsProducedPer.setBounds(32, 602, 271, 14);
+		lblDvdsProducedPer.setBounds(32, 581, 271, 14);
 		lblDvdsProducedPer.setText("Average DVD production per  hour: 0");
 		
 		lblIdleTimeM1 = new Label(shell, SWT.NONE);
-		lblIdleTimeM1.setBounds(32, 639, 170, 14);
+		lblIdleTimeM1.setBounds(32, 621, 375, 14);
 		lblIdleTimeM1.setText("Idle time machine 1: 0");
 		
 		lblIdleTimeFrontM2 = new Label(shell, SWT.NONE);
-		lblIdleTimeFrontM2.setBounds(32, 653, 232, 14);
+		lblIdleTimeFrontM2.setBounds(206, 641, 205, 14);
 		lblIdleTimeFrontM2.setText("Idle time front machine 2: 0");
 
 		lblIdleTimeBackM2 = new Label(shell, SWT.NONE);
-		lblIdleTimeBackM2.setBounds(32, 673, 216, 14);
+		lblIdleTimeBackM2.setBounds(419, 641, 216, 14);
 		lblIdleTimeBackM2.setText("Idle time back machine 2: 0");
 		
 		lblIdleTimeMachineM2 = new Label(shell, SWT.NONE);
-		lblIdleTimeMachineM2.setBounds(32, 693, 186, 14);
+		lblIdleTimeMachineM2.setBounds(32, 641, 174, 14);
 		lblIdleTimeMachineM2.setText("Idle time machine 2: 0 ");
 		
 		lblIdleTimeMachineM3 = new Label(shell, SWT.NONE);
-		lblIdleTimeMachineM3.setBounds(32, 713, 168, 14);
+		lblIdleTimeMachineM3.setBounds(32, 681, 168, 14);
 		lblIdleTimeMachineM3.setText("Idle time machine 3: 0");
 		
 		lblIdleTimeMachineM4 = new Label(shell, SWT.NONE);
-		lblIdleTimeMachineM4.setBounds(32, 728, 168, 14);
+		lblIdleTimeMachineM4.setBounds(32, 701, 168, 14);
 		lblIdleTimeMachineM4.setText("Idle time machine 4: 0 ");
+		
+		lblIdleTimeConveyor = new Label(shell, SWT.NONE);
+		lblIdleTimeConveyor.setBounds(32, 661, 200, 14);
+		lblIdleTimeConveyor.setText("Idle time conveyor belt: 0");
+		
+		lblIdleTimeFrontM3 = new Label(shell, SWT.NONE);
+		lblIdleTimeFrontM3.setBounds(206, 681, 201, 14);
+		lblIdleTimeFrontM3.setText("Idle time front machine 3: 0");
+		
+		lblIdleTimeBackM3 = new Label(shell, SWT.NONE);
+		lblIdleTimeBackM3.setBounds(419, 681, 191, 14);
+		lblIdleTimeBackM3.setText("Idle time back machine 3: 0");
+		
 		
 		
 		dvdFactoryImage = new Label(shell, SWT.NONE);
@@ -521,5 +542,14 @@ public class GUI {
 	}
 	public Label getLblIdleTimeMachineM4() {
 		return lblIdleTimeMachineM4;
+	}
+	public Label getLblIdleTimeConveyor() {
+		return lblIdleTimeConveyor;
+	}
+	public Label getLblIdleTimeBack() {
+		return lblIdleTimeBackM3;
+	}
+	public Label getLblIdleTimeFront() {
+		return lblIdleTimeFrontM3;
 	}
 }
