@@ -5,15 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.DecimalFormat;
 
 
 public class Print {
+	static public DecimalFormat df = new DecimalFormat("###.##");
 	
 	public static void printDVDThroughputTime(double data){
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDThroughputTime.csv",true), "utf-8")); 
-			writer.write(data + "\n"); } catch (IOException ex) { 
+			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -28,7 +30,7 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDProductionPerHour.csv",true), "utf-8")); 
-			writer.write(data + "\n"); } catch (IOException ex) { 
+			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -65,9 +67,11 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + fileName,true), "utf-8")); 
-			writer.write(data + ","); } catch (IOException ex) { 
-				// report 
-				} 
+			writer.write(df.format(data) + ";"); 
+		} 
+		catch (IOException ex) { 
+			// report 
+		} 
 		finally { 
 			try {
 				writer.close();
@@ -102,7 +106,7 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + fileName,true), "utf-8")); 
-			writer.write(data + "\n"); } catch (IOException ex) { 
+			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 

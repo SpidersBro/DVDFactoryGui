@@ -122,6 +122,7 @@ public class DVDFactory {
 	public static double[] m3IdleFrontTime = new double[amountM3];
 	public static double[] m3IdleBackTime = new double[amountM3];
 	public static double[] m4IdleTime = new double[amountM4];
+	public static double[] pmcbIdleTime = new double[amountM2];
 
 	
 	public static boolean[] m3Idle = new boolean[amountM3];
@@ -166,6 +167,7 @@ public class DVDFactory {
 			m2IdleFront[i] = false;
 			m2IdleBack[i] = false;
 			cbIdleTime[i] = 0;
+			pmcbIdleTime[i] = 0;
 			m2IdleFrontTime[i] = 0;
 			m2IdleBackTime[i] = 0;
 			m2Busy[i] = false;
@@ -724,12 +726,12 @@ public class DVDFactory {
 		
 		
 		totalM1IdleTime =  idleTime(m1IdleTime, aTotalM1IdleTime, m1Idle,1);
-		totalM2IdleFrontTime = idleTime(m2IdleFrontTime, aTotalM2IdleFrontTime, m2IdleFront,2);
-		totalM2IdleBackTime = idleTime(m2IdleBackTime, aTotalM2IdleBackTime, m2IdleBack,2);
+		totalM2IdleFrontTime = idleTime(m2IdleFrontTime, aTotalM2IdleFrontTime, m2IdleFront,20);
+		totalM2IdleBackTime = idleTime(m2IdleBackTime, aTotalM2IdleBackTime, m2IdleBack,21);
 		totalM2IdleTime = idleTime(m2IdleTime, aTotalM2IdleTime, mIdle(m2IdleFront,m2IdleBack),2);
-		totalCBIdleTime = idleTime(cbIdleTime, aTotalCBIdleTime, cbIdle,5);
-		totalM3IdleFrontTime = idleTime(m3IdleFrontTime, aTotalM3IdleFrontTime, m3IdleFront(),3);
-		totalM3IdleBackTime = idleTime(m3IdleBackTime, aTotalM3IdleBackTime, m3_3WaitingForSwap,3);
+		totalCBIdleTime = idleTime(pmcbIdleTime, aTotalCBIdleTime, cbIdle,5);
+		totalM3IdleFrontTime = idleTime(m3IdleFrontTime, aTotalM3IdleFrontTime, m3IdleFront(),30);
+		totalM3IdleBackTime = idleTime(m3IdleBackTime, aTotalM3IdleBackTime, m3_3WaitingForSwap,31);
 		totalM3IdleTime = idleTime(m3IdleTime, aTotalM3IdleTime, mIdle(m3IdleFront(),m3_3WaitingForSwap),3);
 		totalM4IdleTime = idleTime(m4IdleTime, aTotalM4IdleTime, m4Idle,4); 
         
