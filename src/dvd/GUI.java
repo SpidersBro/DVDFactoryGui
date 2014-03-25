@@ -4,14 +4,15 @@ package dvd;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+
 import java.text.DecimalFormat;
+import java.util.concurrent.TimeUnit;
 
 public class GUI {
 	
@@ -99,7 +100,7 @@ public class GUI {
 		
 		
 		DVDFactory.init();
-
+		
 		
 		
 		
@@ -171,11 +172,16 @@ public class GUI {
 			} else {
 				lblCartridgeSize_1.setText("DVDs left before refill: " + cartridgeSize_1.toString());
 			}
-
+			
+			// TODO 
+			 int day = (int)TimeUnit.SECONDS.toDays((long)DVDFactory.currentTime);        
+			 long hours = TimeUnit.SECONDS.toHours((long)DVDFactory.currentTime) - (day *24);
+			 long minute = TimeUnit.SECONDS.toMinutes((long)DVDFactory.currentTime) - (TimeUnit.SECONDS.toHours((long)DVDFactory.currentTime)* 60);
+			 long second = TimeUnit.SECONDS.toSeconds((long)DVDFactory.currentTime) - (TimeUnit.SECONDS.toMinutes((long)DVDFactory.currentTime) *60);
 			
 			cbtnRefillM4_0.setSelection(DVDFactory.m4Repairing[0]);
 			cbtnRefillM4_1.setSelection(DVDFactory.m4Repairing[1]);
-			lblCurrentTime.setText("Current time: " + DVDFactory.currentTime);
+			lblCurrentTime.setText("Current time: " + day + " days " + hours + " hours " +minute + " minutes and " + second+ " seconds");
 			
 			
 			//DVDFactory.nextEvent();
@@ -302,7 +308,7 @@ public class GUI {
 		cbtnRefillM4_1.setText("Refill");
 		
 		lblCurrentTime = new Label(shell, SWT.NONE);
-		lblCurrentTime.setBounds(211, 60, 200, 14);
+		lblCurrentTime.setBounds(374, 10, 551, 14);
 		lblCurrentTime.setText("Current Time: 0");
 		
 		cbtnBusyM3 = new Button(shell, SWT.CHECK);

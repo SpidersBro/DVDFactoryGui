@@ -90,8 +90,9 @@ public class DVDFactory {
 	
 	public static double avgDVDPerHour = 0.0;
 	public static ArrayList<DVD> producedDVDList = new ArrayList<DVD>();
+	public static int lastDVD = 0;
 	
-	public static double totalM1IdleTime;
+	public static double totalM1IdleTime = 0.0;
 	public static double totalM2IdleTime = 0.0;
 	public static double totalM2IdleFrontTime = 0.0;
 	public static double totalM2IdleBackTime = 0.0;
@@ -100,6 +101,18 @@ public class DVDFactory {
 	public static double totalM3IdleFrontTime = 0.0;
 	public static double totalM3IdleBackTime = 0.0;
 	public static double totalM4IdleTime = 0.0;
+	
+	public static double[] aTotalM1IdleTime = new double[amountM1];
+	public static double[] aTotalM2IdleTime = new double[amountM2];
+	public static double[] aTotalM2IdleFrontTime = new double[amountM2];
+	public static double[] aTotalM2IdleBackTime = new double[amountM2];
+	public static double[] aTotalCBIdleTime = new double[amountM2];
+	public static double[] aTotalM3IdleTime = new double[amountM3];
+	public static double[] aTotalM3IdleFrontTime = new double[amountM3];
+	public static double[] aTotalM3IdleBackTime = new double[amountM3];
+	public static double[] aTotalM4IdleTime = new double[amountM4];
+	
+	
 	
 	public static double[] m1IdleTime = new double[amountM1];
 	public static double[] m2IdleTime = new double[amountM2];
@@ -133,7 +146,7 @@ public class DVDFactory {
 			m1Idle[i] = false;
 			m1IdleTime[i] = 0;
 			m1RestTime[i] = 0;
-			totalM1IdleTime = 0;
+			aTotalM1IdleTime[i] = 0;
 			DVD dvd = new DVD(0,0);
 			Event m1FinishedEvent = new Event((currentTime+eventTimeM1()),1,i,dvd);
 			Event m1StartRepairEvent = new Event((currentTime+eventTimeStartRepairM1()),2,i,null);
@@ -153,6 +166,12 @@ public class DVDFactory {
 			m2IdleFrontTime[i] = 0;
 			m2IdleBackTime[i] = 0;
 			m2Busy[i] = false;
+			aTotalM2IdleTime[i] = 0;
+			aTotalM2IdleFrontTime[i] = 0;
+			aTotalM2IdleBackTime[i] = 0;
+			aTotalCBIdleTime[i] = 0;
+			
+			
 			//cbWaitingForSwap[i] = false;
 			Queue<DVD> buffer = new LinkedList<DVD>();
 			bufferList.add(buffer);
@@ -169,6 +188,9 @@ public class DVDFactory {
 			m3IdleTime[i] = 0;
 			m3IdleFrontTime[i] = 0;
 			m3IdleBackTime[i] = 0;
+			aTotalM3IdleTime[i] = 0;
+			aTotalM3IdleFrontTime[i] = 0;
+			aTotalM3IdleBackTime[i] = 0;
 			m3_3WaitingForSwap[i] = false; // Same as IdleBack
 			ArrayList<DVD> crateFront = new ArrayList<DVD>();
 			ArrayList<DVD> crateIn = new ArrayList<DVD>();
@@ -183,6 +205,7 @@ public class DVDFactory {
 		for ( int i = 0; i < amountM4; i++){
 			m4Idle[i] = false;
 			m4Repairing[i] = false;
+			aTotalM4IdleTime[i] = 0;
 			//m4Idle[i] = true;
 			cartridge[i] = getCartridgeSize();
 			countDVDs[i] = 0;
@@ -191,10 +214,16 @@ public class DVDFactory {
 		
 		
 		
+		
 		// This is the ending event. It is currently set at 7 days.
 		// TODO: Remove
 		Event endSimulationEvent = new Event((52*7*24*60*60),11,0,null);
 		eventList.add(endSimulationEvent);
+		
+		
+		// 
+		Event pmDVDProductionPerHour = new Event((60*60),12,0,null);
+		eventList.add(pmDVDProductionPerHour);
 		
 	}
 	
@@ -608,28 +637,37 @@ public class DVDFactory {
 		double throughputTime;
 		throughputTime = dvd.endTime - dvd.startTime;
 		totalThroughputTime += throughputTime;
+		Print.printDVDThroughputTime(throughputTime);
 		if(!producedDVDList.isEmpty()) {
 			averageThroughputTime = totalThroughputTime/ producedDVDList.size();
 		}
 	}
 	
 	public static void dvdProductionPerHour(){
+		Print.printDVDProductionPerHour(producedDVDList.size() - lastDVD);
+		lastDVD = producedDVDList.size();
 		avgDVDPerHour = producedDVDList.size() / (currentTime/3600);
+		Event pmDVDProductionPerHour = new Event(currentTime+(60*60),12,0,null);
+		eventList.add(pmDVDProductionPerHour);
 	}
 	
-	public static double idleTime(double[] startIdleTime, double totalIdleTime, boolean[] mIdle ){
+	public static double idleTime(double[] startIdleTime, double[] totalIdleTime, boolean[] mIdle, int machine ){
+		double ttotalIdleTime = 0;
 		for(int i = 0; i < mIdle.length;i++){
 			if(mIdle[i] && startIdleTime[i] == 0) {
 				startIdleTime[i] = currentTime;
+				Print.printStartIdleTime(currentTime, machine, i);
 			} else if (mIdle[i] && startIdleTime[i] != 0) {
-				totalIdleTime += (currentTime - startIdleTime[i]);
+				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = currentTime;
 			} else if (!mIdle[i] && startIdleTime[i] != 0) {
-				totalIdleTime += (currentTime - startIdleTime[i]);
+				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = 0;
+				Print.printEndIdleTime(currentTime, machine, i);
 			}
+		ttotalIdleTime += totalIdleTime[i];
 		}
-		return totalIdleTime;
+		return ttotalIdleTime;
 	}
 	
 	private static boolean[] mIdle(boolean[] front, boolean[] back) {
@@ -674,22 +712,26 @@ public class DVDFactory {
 				break;
 		case 11:finishedSimulation(e);
 				break;
+				//TODO
+		case 12:dvdProductionPerHour();
+				break;
 		default: System.out.println("This is not an event. Eventstep is: " + e.eventStep);
 		}
-		dvdProductionPerHour();
+	//	dvdProductionPerHour();
 		
 		
-        totalM1IdleTime = idleTime(m1IdleTime, totalM1IdleTime, m1Idle);
-        totalM2IdleFrontTime = idleTime(m2IdleFrontTime, totalM2IdleFrontTime, m2IdleFront);
-        totalM2IdleBackTime = idleTime(m2IdleBackTime, totalM2IdleBackTime, m2IdleBack);
-        totalM2IdleTime = idleTime(m2IdleTime, totalM2IdleTime, mIdle(m2IdleFront,m2IdleBack));
-        totalCBIdleTime = idleTime(cbIdleTime, totalCBIdleTime, cbIdle);
-        totalM3IdleFrontTime = idleTime(m3IdleFrontTime, totalM3IdleFrontTime, m3IdleFront());
-        totalM3IdleBackTime = idleTime(m3IdleBackTime, totalM3IdleBackTime, m3_3WaitingForSwap);
-        totalM3IdleTime = idleTime(m3IdleTime, totalM3IdleTime, mIdle(m3IdleFront(),m3_3WaitingForSwap));
-        totalM4IdleTime = idleTime(m4IdleTime, totalM4IdleTime, m4Idle);
+		totalM1IdleTime =  idleTime(m1IdleTime, aTotalM1IdleTime, m1Idle,1);
+		totalM2IdleFrontTime = idleTime(m2IdleFrontTime, aTotalM2IdleFrontTime, m2IdleFront,2);
+		totalM2IdleBackTime = idleTime(m2IdleBackTime, aTotalM2IdleBackTime, m2IdleBack,2);
+		totalM2IdleTime = idleTime(m2IdleTime, aTotalM2IdleTime, mIdle(m2IdleFront,m2IdleBack),2);
+		totalCBIdleTime = idleTime(cbIdleTime, aTotalCBIdleTime, cbIdle,5);
+		totalM3IdleFrontTime = idleTime(m3IdleFrontTime, aTotalM3IdleFrontTime, m3IdleFront(),3);
+		totalM3IdleBackTime = idleTime(m3IdleBackTime, aTotalM3IdleBackTime, m3_3WaitingForSwap,3);
+		totalM3IdleTime = idleTime(m3IdleTime, aTotalM3IdleTime, mIdle(m3IdleFront(),m3_3WaitingForSwap),3);
+		totalM4IdleTime = idleTime(m4IdleTime, aTotalM4IdleTime, m4Idle,4); 
         
-       
+        
+        
 	}
 	
 }
