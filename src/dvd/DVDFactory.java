@@ -30,8 +30,8 @@ public class DVDFactory {
 
 	// These are the variables we can increase or decrease and may  the production.
 	public static double currentTime = 0;
-	public static int bufferSize = 20;
-	public static int crateSize = 20;
+	public static int bufferSize;
+	public static int crateSize;
 	public static int amountM1 = 4;
 	public static int amountM2 = 2;
 	public static int amountM3 = 2;
@@ -134,7 +134,10 @@ public class DVDFactory {
 	
 	
 	//Initial state is declared here
-	public static void init(){
+	public static void init(int bSize, int cSize){
+		
+		bufferSize = bSize;
+		crateSize = cSize;
 		
 		
 		// Production Step 1 is running and needs initial events for the process to begin

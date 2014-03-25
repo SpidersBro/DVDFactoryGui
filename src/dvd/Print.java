@@ -12,8 +12,8 @@ public class Print {
 	public static void printDVDThroughputTime(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDThroughputTime.txt",true), "utf-8")); 
-			writer.write(data + ","); } catch (IOException ex) { 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDThroughputTime.csv",true), "utf-8")); 
+			writer.write(data + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -27,8 +27,8 @@ public class Print {
 	public static void printDVDProductionPerHour(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDProductionPerHour.txt",true), "utf-8")); 
-			writer.write(data + ","); } catch (IOException ex) { 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDProductionPerHour.csv",true), "utf-8")); 
+			writer.write(data + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -42,23 +42,23 @@ public class Print {
 	public static void printStartIdleTime(double data, int type, int number){
 		String fileName;
 		switch(type){
-			case 1: fileName = (number + "M1StartIdleTime.txt");
+			case 1: fileName = (number + "M1IdleTime.csv");
 			break;
-			case 2: fileName = (number + "M2StartIdleTime.txt");
+			case 2: fileName = (number + "M2IdleTime.csv");
 			break;
-			case 20: fileName = (number + "M2StartFIdleTime.txt");
+			case 20: fileName = (number + "M2FIdleTime.csv");
 			break;
-			case 21: fileName = (number + "M2StartBIdleTime.txt");
+			case 21: fileName = (number + "M2BIdleTime.csv");
 			break;
-			case 3: fileName = (number + "M3StartIdleTime.txt");
+			case 3: fileName = (number + "M3IdleTime.csv");
 			break;
-			case 30: fileName = (number + "M3StartFIdleTime.txt");
+			case 30: fileName = (number + "M3FIdleTime.csv");
 			break;
-			case 31: fileName = (number + "M3StartBIdleTime.txt");
+			case 31: fileName = (number + "M3BIdleTime.csv");
 			break;
-			case 4: fileName = (number + "M4StartIdleTime.txt");
+			case 4: fileName = (number + "M4IdleTime.csv");
 			break;
-			case 5: fileName = (number + "CBStartIdleTime.txt");
+			case 5: fileName = (number + "CBIdleTime.csv");
 			break;
 			default: fileName = ("printIdleTimeFailing.txt");
 		}
@@ -79,30 +79,30 @@ public class Print {
 	public static void printEndIdleTime(double data, int type, int number){
 		String fileName;
 		switch(type){
-			case 1: fileName = (number + "M1EndIdleTime.txt");
+			case 1: fileName = (number + "M1IdleTime.csv");
 			break;
-			case 2: fileName = (number + "M2EndIdleTime.txt");
+			case 2: fileName = (number + "M2IdleTime.csv");
 			break;
-			case 20: fileName = (number + "M2EndFIdleTime.txt");
+			case 20: fileName = (number + "M2FIdleTime.csv");
 			break;
-			case 21: fileName = (number + "M2EndBIdleTime.txt");
+			case 21: fileName = (number + "M2BIdleTime.csv");
 			break;
-			case 3: fileName = (number + "M3EndIdleTime.txt");
+			case 3: fileName = (number + "M3IdleTime.csv");
 			break;
-			case 30: fileName = (number + "M3EndFIdleTime.txt");
+			case 30: fileName = (number + "M3FIdleTime.csv");
 			break;
-			case 31: fileName = (number + "M3EndBIdleTime.txt");
+			case 31: fileName = (number + "M3BIdleTime.csv");
 			break;
-			case 4: fileName = (number + "M4EndIdleTime.txt");
+			case 4: fileName = (number + "M4IdleTime.csv");
 			break;
-			case 5: fileName = (number + "CBEndIdleTime.txt");
+			case 5: fileName = (number + "CBIdleTime.csv");
 			break;
 			default: fileName = ("printEndIdleTimeFailing.txt");
 		}
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + fileName,true), "utf-8")); 
-			writer.write(data + ","); } catch (IOException ex) { 
+			writer.write(data + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
 		finally { 

@@ -74,12 +74,25 @@ public class GUI {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		// For testing
+		int bufferSize = 20;
+		int crateSize = 20;
+		double endTime = 24*60*60;
+		
+		
+		Test.testRun(bufferSize, crateSize, endTime); 
+		
+		
+		// Comment all below to disable GUI
+		/*
 		try {
 			GUI window = new GUI();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	
@@ -99,7 +112,7 @@ public class GUI {
 		dvdFactoryImage.setImage(simImage);
 		
 		
-		DVDFactory.init();
+		DVDFactory.init(20,20);
 		
 		
 		
