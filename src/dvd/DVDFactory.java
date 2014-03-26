@@ -21,6 +21,7 @@ public class DVDFactory {
 	public static int dvdsM2 = 0;
 	public static int brokenDVDs = 0;
 	public static long randCalls;
+	public static boolean endOfSimulation = false;
 
 	
 	
@@ -132,11 +133,12 @@ public class DVDFactory {
 	public static double totalM4RefillTime;
 
 	
-	
+	public static int check = 0;
 	
 	//Initial state is declared here
 	public static void init(int bSize, int cSize){
-		
+		System.out.println(check + "jooooow");
+		check++;
 		bufferSize = bSize;
 		crateSize = cSize;
 		currentTime = 0;
@@ -549,6 +551,7 @@ public class DVDFactory {
 	}
 
 	private static void finishedSimulation(Event e){
+		System.out.println(currentTime + "printing");
 		currentTime = e.eventTime;
 		bufferList.clear();
 		m2WaitingDVD.clear();
@@ -559,6 +562,7 @@ public class DVDFactory {
 		crateBackList.clear();
 		producedDVDList.clear();
 		eventList.clear();
+		endOfSimulation = true;
 	}
 
 
@@ -727,17 +731,17 @@ public class DVDFactory {
 		default: System.out.println("This is not an event. Eventstep is: " + e.eventStep);
 		}
 		
-		
-		totalM1IdleTime =  idleTime(m1IdleTime, aTotalM1IdleTime, m1Idle,1);
-		totalM2IdleFrontTime = idleTime(m2IdleFrontTime, aTotalM2IdleFrontTime, m2IdleFront,20);
-		totalM2IdleBackTime = idleTime(m2IdleBackTime, aTotalM2IdleBackTime, m2IdleBack,21);
-		totalM2IdleTime = idleTime(m2IdleTime, aTotalM2IdleTime, mIdle(m2IdleFront,m2IdleBack),2);
-		totalCBIdleTime = idleTime(pmcbIdleTime, aTotalCBIdleTime, cbIdle,5);
-		totalM3IdleFrontTime = idleTime(m3IdleFrontTime, aTotalM3IdleFrontTime, m3IdleFront(),30);
-		totalM3IdleBackTime = idleTime(m3IdleBackTime, aTotalM3IdleBackTime, m3_3WaitingForSwap,31);
-		totalM3IdleTime = idleTime(m3IdleTime, aTotalM3IdleTime, mIdle(m3IdleFront(),m3_3WaitingForSwap),3);
-		totalM4IdleTime = idleTime(m4IdleTime, aTotalM4IdleTime, m4Idle,4); 
-        
+		if(!endOfSimulation){
+			totalM1IdleTime =  idleTime(m1IdleTime, aTotalM1IdleTime, m1Idle,1);
+			totalM2IdleFrontTime = idleTime(m2IdleFrontTime, aTotalM2IdleFrontTime, m2IdleFront,20);
+			totalM2IdleBackTime = idleTime(m2IdleBackTime, aTotalM2IdleBackTime, m2IdleBack,21);
+			totalM2IdleTime = idleTime(m2IdleTime, aTotalM2IdleTime, mIdle(m2IdleFront,m2IdleBack),2);
+			totalCBIdleTime = idleTime(pmcbIdleTime, aTotalCBIdleTime, cbIdle,5);
+			totalM3IdleFrontTime = idleTime(m3IdleFrontTime, aTotalM3IdleFrontTime, m3IdleFront(),30);
+			totalM3IdleBackTime = idleTime(m3IdleBackTime, aTotalM3IdleBackTime, m3_3WaitingForSwap,31);
+			totalM3IdleTime = idleTime(m3IdleTime, aTotalM3IdleTime, mIdle(m3IdleFront(),m3_3WaitingForSwap),3);
+			totalM4IdleTime = idleTime(m4IdleTime, aTotalM4IdleTime, m4Idle,4); 
+		}
         
         
 	}

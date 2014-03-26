@@ -81,7 +81,8 @@ public class GUI {
 		double endTime = 60*60;
 		
 		for(int i = 0; i < 5; i++){
-			
+			DVDFactory.endOfSimulation = false;
+			DVDFactory.init(bufferSize,crateSize);
 			Test.testRun(bufferSize, crateSize, endTime); 
 			System.out.println("Code has ran for: " + (i+1)*3 + " months");
 			System.out.println("Current randCalls: " + DVDFactory.randCalls);
