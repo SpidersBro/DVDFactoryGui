@@ -7,7 +7,7 @@
 *.pydevproject
 .project
 .metadata
-bin/**/*.class
+bin/**/*
 tmp/**
 tmp/**/*
 files/**
