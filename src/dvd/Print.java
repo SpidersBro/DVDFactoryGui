@@ -14,7 +14,7 @@ public class Print {
 	public static void printDVDThroughputTime(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDThroughputTime.csv",true), "utf-8")); 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + DVDFactory.printTime + "DVDThroughputTime.csv",true), "utf-8")); 
 			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
@@ -29,7 +29,7 @@ public class Print {
 	public static void printDVDProductionPerHour(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/DVDProductionPerHour.csv",true), "utf-8")); 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + DVDFactory.printTime + "DVDProductionPerHour.csv",true), "utf-8")); 
 			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
 				// report 
 				} 
@@ -66,7 +66,7 @@ public class Print {
 		}
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + fileName,true), "utf-8")); 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + DVDFactory.printTime   + fileName,true), "utf-8")); 
 			writer.write(df.format(data) + ";"); 
 		} 
 		catch (IOException ex) { 

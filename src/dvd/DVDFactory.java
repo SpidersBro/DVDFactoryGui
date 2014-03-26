@@ -15,6 +15,9 @@ import org.apache.commons.math3.distribution.*;
 public class DVDFactory {
 	
 /////-------------------------------------------- Testing	-------------------------------\\\\\\\\\\	
+	public static int printTime = 0;
+	
+/////-------------------------------------------- Testing	-------------------------------\\\\\\\\\\	
 	public static int dvdsStarted = 0;
 	public static double totalRepairTime = 0;
 	public static int repairNumber = 0;
@@ -136,6 +139,8 @@ public class DVDFactory {
 	
 	//Initial state is declared here
 	public static void init(int bSize, int cSize){
+		printTime++;
+		
 		bufferSize = bSize;
 		crateSize = cSize;
 		currentTime = 0;
