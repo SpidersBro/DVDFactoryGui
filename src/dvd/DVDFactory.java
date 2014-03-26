@@ -30,7 +30,7 @@ public class DVDFactory {
 	
 
 	// These are the variables we can increase or decrease and may  the production.
-	public static double currentTime = 0;
+	public static double currentTime;
 	public static int bufferSize;
 	public static int crateSize;
 	public static int amountM1 = 4;
@@ -87,22 +87,22 @@ public class DVDFactory {
 
 
 	// variables needed for Performance measures
-	public static double totalThroughputTime = 0.0;
-	public static double averageThroughputTime = 0.0;
+	public static double totalThroughputTime;
+	public static double averageThroughputTime;
 	
-	public static double avgDVDPerHour = 0.0;
+	public static double avgDVDPerHour;
 	public static ArrayList<DVD> producedDVDList = new ArrayList<DVD>();
-	public static int lastDVD = 0;
+	public static int lastDVD;
 	
-	public static double totalM1IdleTime = 0.0;
-	public static double totalM2IdleTime = 0.0;
-	public static double totalM2IdleFrontTime = 0.0;
-	public static double totalM2IdleBackTime = 0.0;
-	public static double totalCBIdleTime = 0.0;
-	public static double totalM3IdleTime = 0.0;
-	public static double totalM3IdleFrontTime = 0.0;
-	public static double totalM3IdleBackTime = 0.0;
-	public static double totalM4IdleTime = 0.0;
+	public static double totalM1IdleTime;
+	public static double totalM2IdleTime;
+	public static double totalM2IdleFrontTime;
+	public static double totalM2IdleBackTime;
+	public static double totalCBIdleTime;
+	public static double totalM3IdleTime;
+	public static double totalM3IdleFrontTime;
+	public static double totalM3IdleBackTime;
+	public static double totalM4IdleTime;
 	
 	public static double[] aTotalM1IdleTime = new double[amountM1];
 	public static double[] aTotalM2IdleTime = new double[amountM2];
@@ -113,8 +113,6 @@ public class DVDFactory {
 	public static double[] aTotalM3IdleFrontTime = new double[amountM3];
 	public static double[] aTotalM3IdleBackTime = new double[amountM3];
 	public static double[] aTotalM4IdleTime = new double[amountM4];
-	
-	
 	
 	public static double[] m1IdleTime = new double[amountM1];
 	public static double[] m2IdleTime = new double[amountM2];
@@ -129,9 +127,9 @@ public class DVDFactory {
 	
 	public static boolean[] m3Idle = new boolean[amountM3];
 	
-	public static double totalM1RepairTime = 0.0;
-	public static double totalM3CleaneTime = 0.0;
-	public static double totalM4RefillTime = 0.0;
+	public static double totalM1RepairTime;
+	public static double totalM3CleaneTime;
+	public static double totalM4RefillTime;
 
 	
 	
@@ -142,6 +140,27 @@ public class DVDFactory {
 		bufferSize = bSize;
 		crateSize = cSize;
 		currentTime = 0;
+		
+		totalThroughputTime = 0.0;
+		averageThroughputTime = 0.0;
+		
+		avgDVDPerHour = 0.0;
+		lastDVD = 0;
+		
+		totalM1IdleTime = 0.0;
+		totalM2IdleTime = 0.0;
+		totalM2IdleFrontTime = 0.0;
+		totalM2IdleBackTime = 0.0;
+		totalCBIdleTime = 0.0;
+		totalM3IdleTime = 0.0;
+		totalM3IdleFrontTime = 0.0;
+		totalM3IdleBackTime = 0.0;
+		totalM4IdleTime = 0.0;
+		
+		totalM1RepairTime = 0.0;
+		totalM3CleaneTime = 0.0;
+		totalM4RefillTime = 0.0;
+		
 		
 		// Production Step 1 is running and needs initial events for the process to begin
 		// We need to create m1Amount*2 initial events, 
