@@ -133,12 +133,9 @@ public class DVDFactory {
 	public static double totalM4RefillTime;
 
 	
-	public static int check = 0;
 	
 	//Initial state is declared here
 	public static void init(int bSize, int cSize){
-		System.out.println(check + "jooooow");
-		check++;
 		bufferSize = bSize;
 		crateSize = cSize;
 		currentTime = 0;
@@ -551,7 +548,6 @@ public class DVDFactory {
 	}
 
 	private static void finishedSimulation(Event e){
-		System.out.println(currentTime + "printing");
 		currentTime = e.eventTime;
 		bufferList.clear();
 		m2WaitingDVD.clear();
@@ -670,14 +666,14 @@ public class DVDFactory {
 		for(int i = 0; i < mIdle.length;i++){
 			if(mIdle[i] && startIdleTime[i] == 0) {
 				startIdleTime[i] = currentTime;
-				//Print.printStartIdleTime(currentTime, machine, i);
+				Print.printStartIdleTime(currentTime, machine, i);
 			} else if (mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = currentTime;
 			} else if (!mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = 0;
-				//Print.printEndIdleTime(currentTime, machine, i);
+				Print.printEndIdleTime(currentTime, machine, i);
 			}
 		ttotalIdleTime += totalIdleTime[i];
 		}

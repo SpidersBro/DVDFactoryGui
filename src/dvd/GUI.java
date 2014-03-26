@@ -78,17 +78,15 @@ public class GUI {
 		// For testing
 		int bufferSize = 20;
 		int crateSize = 20;
-		double endTime = 60*60;
+		// 3 months
+		double endTime = 24*60*60;
 		
-		for(int i = 0; i < 5; i++){
+		for(int i = 0; i < 30; i++){
 			DVDFactory.endOfSimulation = false;
-			DVDFactory.init(bufferSize,crateSize);
 			Test.testRun(bufferSize, crateSize, endTime); 
 			System.out.println("Code has ran for: " + (i+1)*3 + " months");
 			System.out.println("Current randCalls: " + DVDFactory.randCalls);
-			System.out.println("Current Time: " + DVDFactory.currentTime);
 		}
-		//System.out.println(DVDFactory.randCalls);
 		
 		// Comment the block below to disable GUI
 		/*
