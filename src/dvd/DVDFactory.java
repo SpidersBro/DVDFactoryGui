@@ -198,7 +198,6 @@ public class DVDFactory {
 			aTotalCBIdleTime[i] = 0;
 			
 			
-			//cbWaitingForSwap[i] = false;
 			Queue<DVD> buffer = new LinkedList<DVD>();
 			bufferList.add(buffer);
 			Queue<Double> cbWaitTime = new LinkedList<Double>();
@@ -249,7 +248,6 @@ public class DVDFactory {
 
 	private static void m1ScheduledFinished(Event e){
 		currentTime = e.eventTime;
-
 		if (e.dvd == null) {
 			System.out.println("Im not real in M1");
 		}
@@ -551,6 +549,15 @@ public class DVDFactory {
 	}
 
 	private static void finishedSimulation(Event e){
+		currentTime = e.eventTime;
+		bufferList.clear();
+		m2WaitingDVD.clear();
+		cbWaitingTime.clear();
+		cbWaitingDVD.clear();
+		crateFrontList.clear();
+		crateInList.clear();
+		crateBackList.clear();
+		producedDVDList.clear();
 		eventList.clear();
 	}
 

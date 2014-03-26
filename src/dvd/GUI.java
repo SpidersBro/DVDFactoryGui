@@ -81,14 +81,15 @@ public class GUI {
 		double endTime = 60*60;
 		
 		for(int i = 0; i < 5; i++){
-			System.out.println("Code has ran for: " + i*3 + " months");
-			System.out.println("Current randCalls: " + DVDFactory.randCalls);
-
+			
 			Test.testRun(bufferSize, crateSize, endTime); 
+			System.out.println("Code has ran for: " + (i+1)*3 + " months");
+			System.out.println("Current randCalls: " + DVDFactory.randCalls);
+			System.out.println("Current Time: " + DVDFactory.currentTime);
 		}
-		System.out.println(DVDFactory.randCalls);
+		//System.out.println(DVDFactory.randCalls);
 		
-		// Comment all below to disable GUI
+		// Comment the block below to disable GUI
 		/*
 		try {
 			GUI window = new GUI();
