@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 
 
 public class Print {
-	static public DecimalFormat df = new DecimalFormat("###.##");
+	static public DecimalFormat df = new DecimalFormat("##########.##");
 	
 	public static void printDVDThroughputTime(double data){
 		Writer writer = null; 

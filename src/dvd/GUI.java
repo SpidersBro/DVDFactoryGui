@@ -78,11 +78,15 @@ public class GUI {
 		// For testing
 		int bufferSize = 20;
 		int crateSize = 20;
-		double endTime = 24*60*60;
+		double endTime = 60*60;
 		
-		
-		Test.testRun(bufferSize, crateSize, endTime); 
-		
+		for(int i = 0; i < 5; i++){
+			System.out.println("Code has ran for: " + i*3 + " months");
+			System.out.println("Current randCalls: " + DVDFactory.randCalls);
+
+			Test.testRun(bufferSize, crateSize, endTime); 
+		}
+		System.out.println(DVDFactory.randCalls);
 		
 		// Comment all below to disable GUI
 		/*
@@ -186,7 +190,6 @@ public class GUI {
 				lblCartridgeSize_1.setText("DVDs left before refill: " + cartridgeSize_1.toString());
 			}
 			
-			// TODO 
 			 int day = (int)TimeUnit.SECONDS.toDays((long)DVDFactory.currentTime);        
 			 long hours = TimeUnit.SECONDS.toHours((long)DVDFactory.currentTime) - (day *24);
 			 long minute = TimeUnit.SECONDS.toMinutes((long)DVDFactory.currentTime) - (TimeUnit.SECONDS.toHours((long)DVDFactory.currentTime)* 60);

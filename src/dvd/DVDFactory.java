@@ -20,6 +20,7 @@ public class DVDFactory {
 	public static int repairNumber = 0;
 	public static int dvdsM2 = 0;
 	public static int brokenDVDs = 0;
+	public static long randCalls;
 
 	
 	
@@ -36,6 +37,7 @@ public class DVDFactory {
 	public static int amountM2 = 2;
 	public static int amountM3 = 2;
 	public static int amountM4 = 2;
+	public static Random random = new Random();
 	
 	
 	public static PriorityQueue<Event> eventList = new PriorityQueue<Event>();
@@ -55,7 +57,7 @@ public class DVDFactory {
 	public static boolean[] m2IdleFront = new boolean[amountM2];
 	public static boolean[] m2IdleBack = new boolean[amountM2];
 	public static ArrayList<DVD> m2WaitingDVD = new ArrayList<DVD>();
-	public static boolean[] m2Busy = new boolean[amountM2]; //!!!!! nieuw
+	public static boolean[] m2Busy = new boolean[amountM2];
 	
 	// state for conveyor belt 
 	public static boolean[] cbIdle = new boolean[amountM2];
@@ -139,7 +141,7 @@ public class DVDFactory {
 		
 		bufferSize = bSize;
 		crateSize = cSize;
-		
+		currentTime = 0;
 		
 		// Production Step 1 is running and needs initial events for the process to begin
 		// We need to create m1Amount*2 initial events, 
@@ -211,22 +213,11 @@ public class DVDFactory {
 			m4Idle[i] = false;
 			m4Repairing[i] = false;
 			aTotalM4IdleTime[i] = 0;
-			//m4Idle[i] = true;
 			cartridge[i] = getCartridgeSize();
 			countDVDs[i] = 0;
 		}
 		
 		
-		
-		
-		
-		// This is the ending event. It is currently set at 7 days.
-		// TODO: Remove
-		Event endSimulationEvent = new Event((52*7*24*60*60),11,0,null);
-		eventList.add(endSimulationEvent);
-		
-		
-		// 
 		Event pmDVDProductionPerHour = new Event((60*60),12,0,null);
 		eventList.add(pmDVDProductionPerHour);
 		
@@ -289,16 +280,11 @@ public class DVDFactory {
 	
 	private static void m1FinishedRepairing(Event e){
 		currentTime = e.eventTime;
-		// TODO checken of het klopt dat deze if weg mag.
-//		if(!m1Idle[e.machineNum]) {
-			double eventM1time = (currentTime+m1RestTime[e.machineNum]);
-			Event m1Finished = new Event(eventM1time,1,e.machineNum,m1DVDWaiting.get(e.machineNum));
-			m1RestTime[e.machineNum] = 0;
-			eventList.add(m1Finished);
-//		}
+		double eventM1time = (currentTime+m1RestTime[e.machineNum]);
+		Event m1Finished = new Event(eventM1time,1,e.machineNum,m1DVDWaiting.get(e.machineNum));
+		m1RestTime[e.machineNum] = 0;
+		eventList.add(m1Finished);
 		m1Repairing[e.machineNum] = false;
-		totalRepairTime = m1StartRepairTime[e.machineNum] + totalRepairTime;  // testing
-		repairNumber++; // testing
 		Event m1StartRepairEvent = new Event(eventTimeStartRepairM1(),2,e.machineNum,null);
 		eventList.add(m1StartRepairEvent);
 	}
@@ -310,9 +296,9 @@ public class DVDFactory {
 		}
 		// Again, we still need to check this PRNG.
 		double dvdBrokenRand;
-		Random rand = new Random();
-		dvdBrokenRand = rand.nextDouble();
-
+		dvdBrokenRand = random.nextDouble();
+		randCalls++;
+		
 		if (!cbIdle[e.machineNum]){
 			m2Busy[e.machineNum] = false;
 			if (dvdBrokenRand > .02) { // DVDs to conveyor belt
@@ -357,8 +343,6 @@ public class DVDFactory {
 		// If conveyor belt is idle set true
 		} else {
 			m2IdleBack[e.machineNum] = true;
-			//TODO m2Idle
-		//	m2Idle[e.machineNum] = true;
 			m2WaitingDVD.set(e.machineNum, e.dvd);
 		}
 	}
@@ -449,12 +433,7 @@ public class DVDFactory {
 							eventList.add(CBfinished);
 						}
 						cbIdle[i] = false;
-						
-						// If the conveyorbelt starts up again, so should M2.
-						//TODO beetje vaag dat hier nog wel zo'n check zit maar denk dat het klopt. willen we die null shit laten staan?
-					//	m2Idle
 						if(m2IdleBack[i]) {
-							//m2Idle[i] = false;
 							m2IdleBack[i] = false;
 							if ( m2WaitingDVD.get(i) == null) {
 								System.out.println("The dvd from m2WaitingDVD is null");
@@ -463,7 +442,6 @@ public class DVDFactory {
 							eventList.add(m2ScheduledFinished);
 							
 						} else if(!bufferList.get(i).isEmpty()){
-						//	m2Idle[i] = false;
 							m2IdleBack[i] = false;
 							Event m2ScheduledFinished = new Event(eventTimeM2(),4,i,bufferList.get(i).remove());
 							eventList.add(m2ScheduledFinished);
@@ -487,7 +465,6 @@ public class DVDFactory {
         m3_numBlockedNozzles[e.machineNum] = 0;
         
         // Make a random object
-        Random rand = new Random();
         double nozzleBlockChance;
        
         // Make temporary Arraylist for easy access.
@@ -497,7 +474,8 @@ public class DVDFactory {
         // Loop over the crate that is currently in the machine
         // check for each dvd if the nozzle gets blocked.
             for(int i = 0; i < tempCrateIn.size(); i++){
-                    nozzleBlockChance = rand.nextDouble();
+                    nozzleBlockChance = random.nextDouble();
+                    randCalls++;
                     if (nozzleBlockChance < .03) {
                             delay += 300;
                             m3_numBlockedNozzles[e.machineNum]++;
@@ -607,18 +585,19 @@ public class DVDFactory {
 	}
 	
 	private static double eventTimeM4() {
-		Random rng = new Random();
-		double m4Time = rng.nextInt(10) + rng.nextDouble() + 20;
+		double m4Time = random.nextInt(10) + random.nextDouble() + 20;
+		randCalls += 2;
 		return currentTime + m4Time;
+		
 	}
 	
 	private static int getCartridgeSize(){
 		double rand1, rand2;
 		
 		// I think this one has a period of 2^48, gotta check though.
-		Random random = new Random();
 		rand1 = random.nextDouble();
 		rand2 = random.nextDouble();
+		randCalls += 2;
 
 		if (rand1 <= .6){
 			return 200;
@@ -661,14 +640,14 @@ public class DVDFactory {
 		for(int i = 0; i < mIdle.length;i++){
 			if(mIdle[i] && startIdleTime[i] == 0) {
 				startIdleTime[i] = currentTime;
-				Print.printStartIdleTime(currentTime, machine, i);
+				//Print.printStartIdleTime(currentTime, machine, i);
 			} else if (mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = currentTime;
 			} else if (!mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = 0;
-				Print.printEndIdleTime(currentTime, machine, i);
+				//Print.printEndIdleTime(currentTime, machine, i);
 			}
 		ttotalIdleTime += totalIdleTime[i];
 		}
@@ -717,12 +696,10 @@ public class DVDFactory {
 				break;
 		case 11:finishedSimulation(e);
 				break;
-				//TODO
-		case 12:dvdProductionPerHour();
+		case 12:dvdProductionPerHour(); // Only here for output of performance measures, not a real event.
 				break;
 		default: System.out.println("This is not an event. Eventstep is: " + e.eventStep);
 		}
-	//	dvdProductionPerHour();
 		
 		
 		totalM1IdleTime =  idleTime(m1IdleTime, aTotalM1IdleTime, m1Idle,1);
