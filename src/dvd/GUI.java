@@ -81,11 +81,12 @@ public class GUI {
 		// 3 months
 		double endTime = 24*60*60;
 		
-		for(int i = 0; i < 30; i++){
+		for(int i = 0; i < 60; i++){
 			DVDFactory.endOfSimulation = false;
 			Test.testRun(bufferSize, crateSize, endTime); 
-			System.out.println("Code has ran for: " + (i+1)*3 + " months");
+			System.out.println("Code has ran for: " + (i+1) + " days");
 			System.out.println("Current randCalls: " + DVDFactory.randCalls);
+			//System.out.println("Current produced DVD's: " + DVDFactory.producedDVDList.size());
 		}
 		
 		// Comment the block below to disable GUI
