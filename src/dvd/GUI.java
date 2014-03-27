@@ -76,28 +76,30 @@ public class GUI {
 	public static void main(String[] args) {
 		
 		// For testing
+		/*
 		int bufferSize = 20;
 		int crateSize = 20;
-		// 3 months
 		double endTime = 24*60*60;
 		
-		for(int i = 0; i < 60; i++){
+		for(int i = 0; i < 15; i++){
 			DVDFactory.endOfSimulation = false;
 			Test.testRun(bufferSize, crateSize, endTime); 
 			System.out.println("Code has ran for: " + (i+1) + " days");
 			System.out.println("Current randCalls: " + DVDFactory.randCalls);
 			//System.out.println("Current produced DVD's: " + DVDFactory.producedDVDList.size());
 		}
-		
+		*/
 		// Comment the block below to disable GUI
-		/*
+		
 		try {
 			GUI window = new GUI();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		*/
+		
+		//Test.uniformDism4();
+		
 	}
 	
 	
@@ -165,7 +167,7 @@ public class GUI {
 			lblNozzlesBlocked0.setText("Nozzles blocked: " + DVDFactory.m3_numBlockedNozzles[0]);
 			lblNozzlesBlocked1.setText("Nozzles blocked: " + DVDFactory.m3_numBlockedNozzles[1]);
 			lblThroughputTime.setText("Average throughput time in minutes: " + df.format(DVDFactory.averageThroughputTime/60));
-			lblDvdsProducedPer.setText("Average DVD production per  hour: " + df.format(DVDFactory.avgDVDPerHour));
+			lblDvdsProducedPer.setText("Average DVD production per  hour: " + df.format(DVDFactory.producedDVDList.size()/(DVDFactory.currentTime/3600)));
 			lblIdleTimeM1.setText("Average idle time machine 1: "+  df.format(DVDFactory.totalM1IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM1) + "%");
 			lblIdleTimeMachineM2.setText("Idle time machine 2: " + df.format(DVDFactory.totalM2IdleTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");
 			lblIdleTimeFrontM2.setText("Idle time front machine 2: "+ df.format(DVDFactory.totalM2IdleFrontTime/DVDFactory.currentTime*100/DVDFactory.amountM2) + "%");

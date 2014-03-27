@@ -145,6 +145,10 @@ public class DVDFactory {
 		crateSize = cSize;
 		currentTime = 0;
 		
+
+		bufferSize = 10;
+		crateSize = 40;
+		
 		totalThroughputTime = 0.0;
 		averageThroughputTime = 0.0;
 		
@@ -595,7 +599,7 @@ public class DVDFactory {
 /////------------------------------------ Event time calculations --------------------------\\\\\\\\\
 	
 
-	private static double eventTimeM1(){
+	public static double eventTimeM1(){
 		double scale=3.51;
 		double shape=1.23;
 		LogNormalDistribution log = new LogNormalDistribution(scale, shape);
@@ -615,7 +619,7 @@ public class DVDFactory {
 		return currentTime + exp.sample();
 	}
 	
-	private static double eventTimeM2() {
+	public static double eventTimeM2() {
 		double scale=2.91;
 		double shape=0.822;
 		LogNormalDistribution log = new LogNormalDistribution(scale, shape);
@@ -639,7 +643,7 @@ public class DVDFactory {
 		return currentTime + 180;
 	}
 	
-	private static double eventTimeM4() {
+	public static double eventTimeM4() {
 		double m4Time = random.nextInt(10) + random.nextDouble() + 20;
 		randCalls += 2;
 		return currentTime + m4Time;
@@ -695,14 +699,14 @@ public class DVDFactory {
 		for(int i = 0; i < mIdle.length;i++){
 			if(mIdle[i] && startIdleTime[i] == 0) {
 				startIdleTime[i] = currentTime;
-				Print.printStartIdleTime(currentTime, machine, i);
+				//Print.printStartIdleTime(currentTime, machine, i);
 			} else if (mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = currentTime;
 			} else if (!mIdle[i] && startIdleTime[i] != 0) {
 				totalIdleTime[i] += (currentTime - startIdleTime[i]);
 				startIdleTime[i] = 0;
-				Print.printEndIdleTime(currentTime, machine, i);
+				//Print.printEndIdleTime(currentTime, machine, i);
 			}
 		ttotalIdleTime += totalIdleTime[i];
 		}
