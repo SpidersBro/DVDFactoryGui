@@ -66,29 +66,6 @@ public class Test {
 
 	}
 	
-	public static void uniformDism4() {
 		
-		Writer writer = null; 
-		for(int i = 0; i < 500; i++){
-			try { 
-				writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "uniformDism4.csv",true), "utf-8")); 
-				writer.write( DVDFactory.eventTimeM4() + "\n"); } catch (IOException ex) { 
-					// report 
-					} 
-			finally { 
-				try {
-					writer.close();
-				} catch (Exception ex) {
-				} 
-			}
 			
-		}
-		
-
-	}
-	
-	
-	
-	
-	
 }

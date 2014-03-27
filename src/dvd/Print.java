@@ -14,8 +14,14 @@ public class Print {
 	public static void printDVDThroughputTime(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDThroughputTime.csv",true), "utf-8")); 
-			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDThroughputTime"+ DVDFactory.bufferSize + "x" + DVDFactory.crateSize + ".csv",true), "utf-8")); 
+			if( DVDFactory.firstPrint1){
+				writer.write( "......" + "\n" + df.format(data) + "\n"); 
+				DVDFactory.firstPrint1 = false;
+			} else {
+				writer.write(df.format(data) + "\n"); 
+			}
+			} catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -29,8 +35,13 @@ public class Print {
 	public static void printDVDProductionPerHour(double data){
 		Writer writer = null; 
 		try { 
-			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDProductionPerHour.csv",true), "utf-8")); 
-			writer.write(df.format(data) + "\n"); } catch (IOException ex) { 
+			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDProductionPerHour" + DVDFactory.bufferSize + "x" + DVDFactory.crateSize + ".csv",true), "utf-8")); 
+			if( DVDFactory.firstPrint2){
+				writer.write( "......" + "\n" + df.format(data) + "\n"); 
+				DVDFactory.firstPrint2 = false;
+			} else {
+				writer.write(df.format(data) + "\n"); 
+			}			} catch (IOException ex) { 
 				// report 
 				} 
 		finally { 
@@ -67,7 +78,12 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + fileName,true), "utf-8")); 
-			writer.write(df.format(data) + ";"); 
+			if( DVDFactory.firstPrint3){
+				writer.write( "......" + "\n" + df.format(data) + ";"); 
+				DVDFactory.firstPrint3 = false;
+			} else {
+				writer.write(df.format(data) + ";"); 
+			}
 		} 
 		catch (IOException ex) { 
 			// report 

@@ -76,29 +76,32 @@ public class GUI {
 	public static void main(String[] args) {
 		
 		// For testing
-		/*
-		int bufferSize = 20;
-		int crateSize = 20;
-		double endTime = 24*60*60;
 		
-		for(int i = 0; i < 15; i++){
+		int bufferSize = 20;
+		int crateSize = 1;
+		double endTime = 11*24*60*60;
+		
+		for(int i = 0; i < 40; i++){
 			DVDFactory.endOfSimulation = false;
 			Test.testRun(bufferSize, crateSize, endTime); 
-			System.out.println("Code has ran for: " + (i+1) + " days");
-			System.out.println("Current randCalls: " + DVDFactory.randCalls);
-			//System.out.println("Current produced DVD's: " + DVDFactory.producedDVDList.size());
+			System.out.println("Code has ran for: " + endTime/(24*3600)*(i+1) + " days");
+			System.out.println("Average throughput time in minutes: " + (DVDFactory.totalThroughputTime /DVDFactory.producedDVDList.size())/60);
+			System.out.println("Current produced DVD's per hour: " + DVDFactory.producedDVDList.size()/(DVDFactory.currentTime/3600));
+			System.out.println("Amount of DVD's produced: " + DVDFactory.producedDVDList.size());
+			System.out.println("This is run number: " + (i+1) );
+			DVDFactory.producedDVDList.clear();
 		}
-		*/
-		// Comment the block below to disable GUI
 		
+		// Comment the block below to disable GUI
+		/*
 		try {
 			GUI window = new GUI();
+			DVDFactory.init(20,20);
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		//Test.uniformDism4();
+		*/
 		
 	}
 	
@@ -119,7 +122,6 @@ public class GUI {
 		dvdFactoryImage.setImage(simImage);
 		
 		
-		DVDFactory.init(20,20);
 		
 		
 		
