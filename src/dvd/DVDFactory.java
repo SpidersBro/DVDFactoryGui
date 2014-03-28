@@ -272,7 +272,7 @@ public class DVDFactory {
 		
 		// calculates which buffer belongs to which machine
 		int indexBuffer;
-		if(e.machineNum == 0 || e.machineNum == 1) {
+		if(e.machineNum == 0 || e.machineNum == 1 /* e.machineNum ==2 */) {
 			indexBuffer = 0;
 		} else {
 			indexBuffer = 1;
@@ -366,15 +366,18 @@ public class DVDFactory {
 			}
 			
 			// In case any M1 of this M2 is Idle	
-			int option1=5;
-			int option2=5;
+			int option1;
+			int option2;
+			int option3;
 			if(e.machineNum == 0){
 				option1 = 0;
 				option2 = 1;
+			//	option3 = 2;
 			} else {
-				option1 = 2;
-				option2 = 3;
-			}
+				option1 = 2; //3;
+				option2 = 3; //4;
+			//	option3 = 5;
+			} 
 			if (m1Idle[option1]){
 				Event m1Finished = new Event(currentTime,1,option1,m1DVDWaiting.get(option1));
 				eventList.add(m1Finished);
@@ -387,6 +390,13 @@ public class DVDFactory {
 				m1DVDWaiting.set(option2,null);
 				m1Idle[option2] = false;
 			}
+//			if (m1Idle[option3]){
+//				Event m1Finished = new Event(currentTime,1,option3,m1DVDWaiting.get(option3));
+//				eventList.add(m1Finished);
+//				m1DVDWaiting.set(option3,null);
+//				m1Idle[option3] = false;
+//			}
+			
 			// If buffer not empty schedule new m2Finished
 			if(!bufferList.get(e.machineNum).isEmpty()){
 				m2IdleFront[e.machineNum] = false;
@@ -435,82 +445,72 @@ public class DVDFactory {
 	
 	private static void cratesScheduledSwap(Event e) {
 		currentTime = e.eventTime;
-		
-		ArrayList<DVD> tempCrateFront = new ArrayList<DVD>();
-		ArrayList<DVD> tempCrateIn = new ArrayList<DVD>();
-		
+		for(int j = 0; j < amountM3; j++ ) {
+			for(int k = 0; k < amountM4; k++) {
+				ArrayList<DVD> tempCrateIn = new ArrayList<DVD>();
+				/*
+				 * 
+				 * A crate must be swapped from Back to In when:
+				 * 		crateBack.size() = 0 AND crateIn.size() = 20. 
+				 * 		For any machines in the line
+				 * 
+				 * OR
+				 */			
+				if(  crateBackList.get(k).isEmpty() && crateInList.get(j).size() == crateSize && m3_3WaitingForSwap[j]) {
+					//Swap crateBack and CrateIn
+					tempCrateIn = (ArrayList<DVD>) crateInList.get(j).clone();
+					crateBackList.set(k,tempCrateIn);
+					crateInList.get(j).clear();
+					
+					//If M4 is not repairing, it should now start again.
+					if(!m4Repairing[k]) {
+						Event m4ScheduledFinished = new Event(eventTimeM4(),9,k,null);
+						eventList.add(m4ScheduledFinished);
+					}
+					m3_3WaitingForSwap[j] = false;
+					m4Idle[k] = false;
+				}
+			}
+		}
+		/* 
+		 * 
+		 *
+		 * A crate must be swapped from In to Front when:
+		 * 		crateIn.size() = 0  AND crateFront.size() = 20.
+		 * 		(this is the case in the initial state and otherwise only when 2 and 3 already have been swapped)
+		 * 
+		 */	
 		for(int i = 0; i < amountM2; i++ ){
-			for(int j = 0; j < amountM3; j++ ) {
-				for(int k = 0; k < amountM4; k++) {
-					
-					
-					/*
-					 * 
-					 * A crate must be swapped from Back to In when:
-					 * 		crateBack.size() = 0 AND crateIn.size() = 20. 
-					 * 		For any machines in the line
-					 * 
-					 * OR
-					 */			
-					if(  crateBackList.get(k).isEmpty() && crateInList.get(j).size() == crateSize && m3_3WaitingForSwap[j]) {
-						//Swap crateBack and CrateIn
-						tempCrateIn = (ArrayList<DVD>) crateInList.get(j).clone();
-						crateBackList.set(k,tempCrateIn);
-						crateInList.get(j).clear();
-						
-						//If M4 is not repairing, it should now start again.
-						if(!m4Repairing[k]) {
-							Event m4ScheduledFinished = new Event(eventTimeM4(),9,k,null);
-							eventList.add(m4ScheduledFinished);
-						}
-						
-						m3_3WaitingForSwap[j] = false;
-						m4Idle[k] = false;
-						
+			for(int j = 0; j < amountM3; j++ ) {	
+				ArrayList<DVD> tempCrateFront = new ArrayList<DVD>();		
+				if (crateInList.get(j).isEmpty() && crateFrontList.get(i).size() == crateSize ) {
+					//Swap crateIn with crateFront
+					tempCrateFront = (ArrayList<DVD>) crateFrontList.get(i).clone();
+					crateInList.set(j,tempCrateFront);
+					crateFrontList.get(i).clear();
+					// If the front crate is now empty, start up the conveyor belt in front of the crate again.
+					while(!cbWaitingDVD.get(i).isEmpty()){
+						DVD this_DVD = cbWaitingDVD.get(i).remove();
+						Event CBfinished = new Event((currentTime + cbWaitingTime.get(i).remove()),5,i,this_DVD);
+						eventList.add(CBfinished);
 					}
-					
-					
-					/* 
-					 * 
-					 *
-					 * A crate must be swapped from In to Front when:
-					 * 		crateIn.size() = 0  AND crateFront.size() = 20.
-					 * 		(this is the case in the initial state and otherwise only when 2 and 3 already have been swapped)
-					 * 
-					 */	
-					if (crateInList.get(j).isEmpty() && crateFrontList.get(i).size() == crateSize ) {
-						
-						//Swap crateIn with crateFront
-						tempCrateFront = (ArrayList<DVD>) crateFrontList.get(i).clone();
-						crateInList.set(j,tempCrateFront);
-						crateFrontList.get(i).clear();
-
-						// If the front crate is now empty, start up the conveyor belt in front of the crate again.
-						while(!cbWaitingDVD.get(i).isEmpty()){
-							DVD this_DVD = cbWaitingDVD.get(i).remove();
-							Event CBfinished = new Event((currentTime + cbWaitingTime.get(i).remove()),5,i,this_DVD);
-							eventList.add(CBfinished);
+					cbIdle[i] = false;
+					if(m2IdleBack[i]) {
+						m2IdleBack[i] = false;
+						if ( m2WaitingDVD.get(i) == null) {
+							System.out.println("The dvd from m2WaitingDVD is null");
 						}
-						cbIdle[i] = false;
-						if(m2IdleBack[i]) {
-							m2IdleBack[i] = false;
-							if ( m2WaitingDVD.get(i) == null) {
-								System.out.println("The dvd from m2WaitingDVD is null");
-							}
-							Event m2ScheduledFinished = new Event(currentTime,4,i,m2WaitingDVD.get(i));
-							eventList.add(m2ScheduledFinished);
-							
-						} else if(!bufferList.get(i).isEmpty()){
-							//m2IdleBack[i] = false;
-							Event m2ScheduledFinished = new Event(eventTimeM2(),4,i,bufferList.get(i).remove());
-							eventList.add(m2ScheduledFinished);
-						}
-						
-						// And if crateIn is now full, M3 should also start again.
-						Event m3_12ScheduledFinished = new Event(eventTimeM3_12(),7,j,null);
-						eventList.add(m3_12ScheduledFinished);
-						
+						Event m2ScheduledFinished = new Event(currentTime,4,i,m2WaitingDVD.get(i));
+						m2WaitingDVD.set(i,null);
+						eventList.add(m2ScheduledFinished);
+					} else if(!bufferList.get(i).isEmpty()){
+						//m2IdleBack[i] = false;
+						Event m2ScheduledFinished = new Event(eventTimeM2(),4,i,bufferList.get(i).remove());
+						eventList.add(m2ScheduledFinished);
 					}
+					// And if crateIn is now full, M3 should also start again.
+					Event m3_12ScheduledFinished = new Event(eventTimeM3_12(),7,j,null);
+					eventList.add(m3_12ScheduledFinished);
 				}
 			}
 		}
