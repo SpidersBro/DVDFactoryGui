@@ -40,7 +40,7 @@ public class Print {
 				writer.write( "......" + "\n" + df.format(data) +  "\n"); 
 				DVDFactory.firstPrint2 = false;
 			} else {
-				writer.write(df.format(data) + "\n"); 
+				writer.write(df.format(data)+ ";" + DVDFactory.m1Int + "\n"); 
 			}			} catch (IOException ex) { 
 				// report 
 				} 

@@ -77,13 +77,13 @@ public class GUI {
 		
 		// For testing
 		
-		int bufferSize = 20;
+		int bufferSize = 10000;
 		int crateSize = 20;
 		double endTime = 11*24*60*60;
 		
 		int[] crateSizes = {1,5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,30,40,50,60,70,80,100};
 		
-		for(int j = 0; j < crateSizes.length; j++){
+		//for(int j = 0; j < crateSizes.length; j++){
 			for(int i = 0; i < 40; i++){
 				DVDFactory.endOfSimulation = false;
 				Test.testRun(bufferSize, crateSize, endTime); 
@@ -94,7 +94,7 @@ public class GUI {
 				System.out.println("This is run number: " + (i+1) );
 				DVDFactory.producedDVDList.clear();
 			}
-		}
+		//}
 			
 		
 		// Comment the block below to disable GUI

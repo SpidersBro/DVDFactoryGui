@@ -291,6 +291,7 @@ public class DVDFactory {
 				}	
 				// Machines go from 4 to 2, so we need to change machineNum accordingly
 				e.machineNum = indexBuffer;
+				m1Int++;
 			} else {
 				m1Idle[e.machineNum] = true;
 				if(e.dvd == null){
@@ -733,7 +734,7 @@ public class DVDFactory {
         avgDVDPerHour = (producedDVDList.size() - lastDVD);
         lastDVD = producedDVDList.size();
         
-        if(currentTime >= 25*60*60) {
+        if(currentTime > 24*60*60) {
                 Print.printDVDProductionPerHour(avgDVDPerHour);
         }
         m1Int=0;
@@ -782,7 +783,7 @@ public class DVDFactory {
 		Event e = eventList.remove();
 		switch(e.eventStep) {
 		case 1: m1ScheduledFinished(e); 
-				m1Int++;
+				//m1Int++;
 				break;
 		case 2: m1StartRepairing(e);
 				break;
