@@ -37,7 +37,7 @@ public class Print {
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDProductionPerHour" + DVDFactory.bufferSize + "x" + DVDFactory.crateSize + ".csv",true), "utf-8")); 
 			if( DVDFactory.firstPrint2){
-				writer.write( "......" + "\n" + df.format(data) + "\n"); 
+				writer.write( "......" + "\n" + df.format(data) +  "\n"); 
 				DVDFactory.firstPrint2 = false;
 			} else {
 				writer.write(df.format(data) + "\n"); 
