@@ -15,12 +15,7 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDThroughputTime"+ DVDFactory.bufferSize + "x" + DVDFactory.crateSize + ".csv",true), "utf-8")); 
-			if( DVDFactory.firstPrint1){
-				writer.write( "......" + "\n" + df.format(data) + "\n"); 
-				DVDFactory.firstPrint1 = false;
-			} else {
-				writer.write(df.format(data) + "\n"); 
-			}
+			writer.write(df.format(data) + "\n"); 
 			} catch (IOException ex) { 
 				// report 
 				} 
@@ -36,12 +31,8 @@ public class Print {
 		Writer writer = null; 
 		try { 
 			writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream("./files/" + "DVDProductionPerHour" + DVDFactory.bufferSize + "x" + DVDFactory.crateSize + ".csv",true), "utf-8")); 
-			if( DVDFactory.firstPrint2){
-				writer.write( "......" + "\n" + df.format(data) +  "\n"); 
-				DVDFactory.firstPrint2 = false;
-			} else {
-				writer.write(df.format(data)+ ";" + DVDFactory.m1Int + "\n"); 
-			}			} catch (IOException ex) { 
+			writer.write(df.format(data)+ ";" + DVDFactory.m1Int + "\n"); 
+		} catch (IOException ex) { 
 				// report 
 				} 
 		finally { 

@@ -43,7 +43,7 @@ public class DVDFactory {
 	public static double currentTime;
 	public static int bufferSize;
 	public static int crateSize;
-	public static int amountM1 = 4;
+	public static int amountM1 = 6;
 	public static int amountM2 = 2;
 	public static int amountM3 = 2;
 	public static int amountM4 = 2;
@@ -272,7 +272,7 @@ public class DVDFactory {
 		
 		// calculates which buffer belongs to which machine
 		int indexBuffer;
-		if(e.machineNum == 0 || e.machineNum == 1 /* e.machineNum ==2 */) {
+		if(e.machineNum == 0 || e.machineNum == 1 || e.machineNum ==2 ) {
 			indexBuffer = 0;
 		} else {
 			indexBuffer = 1;
@@ -373,11 +373,11 @@ public class DVDFactory {
 			if(e.machineNum == 0){
 				option1 = 0;
 				option2 = 1;
-			//	option3 = 2;
+				option3 = 2;
 			} else {
-				option1 = 2; //3;
-				option2 = 3; //4;
-			//	option3 = 5;
+				option1 = 3;
+				option2 = 4;
+				option3 = 5;
 			} 
 			if (m1Idle[option1]){
 				Event m1Finished = new Event(currentTime,1,option1,m1DVDWaiting.get(option1));
@@ -391,12 +391,12 @@ public class DVDFactory {
 				m1DVDWaiting.set(option2,null);
 				m1Idle[option2] = false;
 			}
-//			if (m1Idle[option3]){
-//				Event m1Finished = new Event(currentTime,1,option3,m1DVDWaiting.get(option3));
-//				eventList.add(m1Finished);
-//				m1DVDWaiting.set(option3,null);
-//				m1Idle[option3] = false;
-//			}
+			if (m1Idle[option3]){
+				Event m1Finished = new Event(currentTime,1,option3,m1DVDWaiting.get(option3));
+				eventList.add(m1Finished);
+				m1DVDWaiting.set(option3,null);
+				m1Idle[option3] = false;
+			}
 			
 			// If buffer not empty schedule new m2Finished
 			if(!bufferList.get(e.machineNum).isEmpty()){
@@ -701,11 +701,11 @@ public class DVDFactory {
         if(currentTime >= 24*60*60) {
                 dvdAfterStable++;
                 totalThroughputTime += throughputTime;
-                if(dvdAfterStable%100 == 0) {
-                        averageThroughputTime = totalThroughputTime/ 100;
-                        Print.printDVDThroughputTime(averageThroughputTime);
-                        totalThroughputTime = 0;
-                }
+        //        if(dvdAfterStable%100 == 0) {
+        //                averageThroughputTime = totalThroughputTime/ 100;
+        //                Print.printDVDThroughputTime(averageThroughputTime);
+        //                totalThroughputTime = 0;
+        //        }
         }
 }
 	
@@ -731,11 +731,11 @@ public class DVDFactory {
         */
         Event pmDVDProductionPerHour = new Event(currentTime+(60*60),12,0,null);
         eventList.add(pmDVDProductionPerHour);
-        avgDVDPerHour = (producedDVDList.size() - lastDVD);
-        lastDVD = producedDVDList.size();
+       // avgDVDPerHour = (producedDVDList.size() - lastDVD);
         
-        if(currentTime > 24*60*60) {
-                Print.printDVDProductionPerHour(avgDVDPerHour);
+        
+        if(currentTime <= 24*60*60) {
+        	lastDVD = producedDVDList.size();    
         }
         m1Int=0;
 }

@@ -77,26 +77,53 @@ public class GUI {
 		
 		// For testing
 		
-		int bufferSize = 10000;
-		int crateSize = 20;
+		int bufferSize = 20;
+	//	int crateSize = 20;
 		double endTime = 11*24*60*60;
 		
-		int[] crateSizes = {1,5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,30,40,50,60,70,80,100};
+		int[] crateSizes = {50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200};
 		
-		//for(int j = 0; j < crateSizes.length; j++){
+		for(int j = 0; j < crateSizes.length; j++){
 			for(int i = 0; i < 40; i++){
 				DVDFactory.endOfSimulation = false;
-				Test.testRun(bufferSize, crateSize, endTime); 
-				System.out.println("Code has ran for: " + endTime/(24*3600)*(i+1) + " days");
-				System.out.println("Average throughput time in minutes: " + (DVDFactory.totalThroughputTime /DVDFactory.producedDVDList.size())/60);
-				System.out.println("Current produced DVD's per hour: " + DVDFactory.producedDVDList.size()/(DVDFactory.currentTime/3600));
-				System.out.println("Amount of DVD's produced: " + DVDFactory.producedDVDList.size());
-				System.out.println("This is run number: " + (i+1) );
+				Test.testRun(bufferSize, crateSizes[j], endTime); 
+//				System.out.println("Code has ran for: " + endTime/(24*3600)*(i+1) + " days");
+//				System.out.println("Average throughput time in minutes: " + (DVDFactory.totalThroughputTime /DVDFactory.producedDVDList.size())/60);
+//				System.out.println("Current produced DVD's per hour: " + DVDFactory.producedDVDList.size()/(DVDFactory.currentTime/3600));
+//				System.out.println("Amount of DVD's produced: " + DVDFactory.producedDVDList.size());
+				
+				Print.printDVDThroughputTime(DVDFactory.totalThroughputTime/DVDFactory.dvdAfterStable);
+				Print.printDVDProductionPerHour((DVDFactory.producedDVDList.size() - DVDFactory.lastDVD)/(endTime-(24*60*60)));
+				DVDFactory.dvdAfterStable = 0;
 				DVDFactory.producedDVDList.clear();
 			}
-		//}
-			
+			System.out.println("This is run number: "  + (j+1));
+		}
 		
+	//	bufferSize = 40;
+	//	crateSize = 20;
+	//	endTime = 11*24*60*60;
+		
+	//	int[] crateSizes = {1,5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,30,40,50,60,70,80,100};
+		/*
+		for(int j = 0; j < crateSizes.length; j++){
+			for(int i = 0; i < 40; i++){
+				DVDFactory.endOfSimulation = false;
+				Test.testRun(bufferSize, crateSizes[j], endTime); 
+//				System.out.println("Code has ran for: " + endTime/(24*3600)*(i+1) + " days");
+//				System.out.println("Average throughput time in minutes: " + (DVDFactory.totalThroughputTime /DVDFactory.producedDVDList.size())/60);
+//				System.out.println("Current produced DVD's per hour: " + DVDFactory.producedDVDList.size()/(DVDFactory.currentTime/3600));
+//				System.out.println("Amount of DVD's produced: " + DVDFactory.producedDVDList.size());
+				
+				Print.printDVDThroughputTime(DVDFactory.totalThroughputTime/DVDFactory.dvdAfterStable);
+				Print.printDVDProductionPerHour((DVDFactory.producedDVDList.size() - DVDFactory.lastDVD)/(endTime-(24*60*60)));
+				DVDFactory.dvdAfterStable = 0;
+				DVDFactory.producedDVDList.clear();
+			}
+			System.out.println("This is run number: "  + (j+1));
+		}
+			
+		*/
 		// Comment the block below to disable GUI
 		/*
 		try {
